@@ -1,0 +1,13 @@
+pandas
+numpy
+pyecharts
+pyodbc
+stylecloud
+flask
+requests
+lxml
+bs4
+cryptography
+jieba
+wordcloud
+pillow

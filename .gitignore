@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+
+venv/
+.venv/
+
+.idea/workspace.xml
+.idea/shelf/
+.idea/
+
+spider/douban_cookie.txt
+backups/
+
+*.log
