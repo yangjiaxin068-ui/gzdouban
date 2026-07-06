@@ -8,11 +8,11 @@
     
 </head>
 <body >
-    <div id="32d7bdc7d7ef4a5ab5a40d068d228240" class="chart-container" style="width:100%; height:100%; "></div>
+    <div id="051c9c75ac5e4e929ef940d08700d2dc" class="chart-container" style="width:100%; height:100%; "></div>
     <script>
-        var chart_32d7bdc7d7ef4a5ab5a40d068d228240 = echarts.init(
-            document.getElementById('32d7bdc7d7ef4a5ab5a40d068d228240'), 'white', {renderer: 'canvas', locale: 'ZH'});
-        var option_32d7bdc7d7ef4a5ab5a40d068d228240 = {
+        var chart_051c9c75ac5e4e929ef940d08700d2dc = echarts.init(
+            document.getElementById('051c9c75ac5e4e929ef940d08700d2dc'), 'white', {renderer: 'canvas', locale: 'ZH'});
+        var option_051c9c75ac5e4e929ef940d08700d2dc = {
     "animation": true,
     "animationThreshold": 2000,
     "animationDuration": 1000,
@@ -74,20 +74,19 @@
                 }
             ],
             "radius": [
-                "30%",
-                "60%"
+                "36%",
+                "66%"
             ],
             "center": [
                 "50%",
-                "50%"
+                "52%"
             ],
             "label": {
                 "show": true,
                 "color": "#dffaff",
                 "margin": 8,
-                "fontSize": 15,
-                "fontStyle": "bold",
-                "formatter": "{b}:{c}\u4e2a",
+                "fontSize": 14,
+                "formatter": "{b}: {c}",
                 "richInheritPlainLabel": true,
                 "valueAnimation": false
             },
@@ -122,14 +121,17 @@
                 "\u7231\u60c5"
             ],
             "selected": {},
+            "type": "scroll",
             "show": true,
+            "left": "center",
+            "bottom": "0",
             "padding": 5,
             "itemGap": 10,
             "itemWidth": 25,
             "itemHeight": 14,
             "textStyle": {
                 "color": "#dffaff",
-                "fontSize": 15,
+                "fontSize": 13,
                 "richInheritPlainLabel": true
             },
             "backgroundColor": "transparent",
@@ -154,7 +156,7 @@
         "trigger": "item",
         "triggerOn": "mousemove|click",
         "axisPointer": {
-            "type": "shadow"
+            "type": "line"
         },
         "showContent": true,
         "alwaysShowContent": false,
@@ -165,6 +167,7 @@
         "appendToBody": false,
         "transitionDuration": 0.4,
         "displayTransition": true,
+        "formatter": "{b}: {c}\u90e8 ({d}%)",
         "textStyle": {
             "fontSize": 14,
             "richInheritPlainLabel": true
@@ -194,9 +197,9 @@
         "#a78bfa"
     ]
 };
-        chart_32d7bdc7d7ef4a5ab5a40d068d228240.setOption(option_32d7bdc7d7ef4a5ab5a40d068d228240);
+        chart_051c9c75ac5e4e929ef940d08700d2dc.setOption(option_051c9c75ac5e4e929ef940d08700d2dc);
             window.addEventListener('resize', function(){
-                chart_32d7bdc7d7ef4a5ab5a40d068d228240.resize();
+                chart_051c9c75ac5e4e929ef940d08700d2dc.resize();
             })
     </script>
 </body>

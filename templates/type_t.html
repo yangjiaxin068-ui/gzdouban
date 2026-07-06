@@ -1,24 +1,25 @@
 {% extends "base.html" %}
-{% block title %}类型分析{% endblock %}
+{% block title %}类型分析 - 电影数据分析系统{% endblock %}
 {% block content %}
 <div class="app-page">
-    <div class="page-head">
+    <section class="page-head">
         <div>
-            <div class="page-kicker">Genre</div>
+            <span class="eyebrow">Genre</span>
             <h1 class="page-title">电影类型分析</h1>
             <p class="page-subtitle">统计出现次数最高的电影类型，快速查看题材结构。</p>
         </div>
-    </div>
+    </section>
 
-    <div class="card">
-        <div class="card-header">
+    <section class="panel-card">
+        <div class="panel-title">
+            <div>
+                <span class="eyebrow">Top 10</span>
+                <h2>类型数量排行</h2>
+            </div>
             <i class="fas fa-layer-group"></i>
-            类型数量 Top 10
         </div>
-        <div class="card-body">
-            <div id="typeChart" class="chart-box chart-tall"></div>
-        </div>
-    </div>
+        <div id="typeChart" class="chart-box chart-tall"></div>
+    </section>
 </div>
 {% endblock %}
 
@@ -28,16 +29,16 @@
   const typeData = {{ top10Data | tojson }};
 
   typeChart.setOption({
-    color: ['#2563eb', '#14b8a6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316', '#64748b', '#0f766e'],
-    tooltip: { trigger: 'item', formatter: '{b}<br>{c} 部 ({d}%)' },
-    legend: { orient: 'vertical', right: 24, top: 'middle', itemGap: 14 },
+    color: ['#2f6fed', '#1aa99a', '#f5a524', '#e25563', '#7c3aed', '#0891b2', '#5d7c2f', '#d97706', '#64748b', '#be185d'],
+    tooltip: { trigger: 'item', formatter: '{b}<br>{c} 部 ({d}%)', borderWidth: 0, backgroundColor: 'rgba(20, 24, 33, 0.92)', textStyle: { color: '#fff' } },
+    legend: { orient: 'vertical', right: 24, top: 'middle', itemGap: 14, textStyle: { color: '#64748b' } },
     series: [{
       name: '电影类型',
       type: 'pie',
       radius: ['44%', '70%'],
       center: ['40%', '50%'],
       data: typeData,
-      label: { formatter: '{b}: {c}', color: '#344054' },
+      label: { formatter: '{b}: {c}', color: '#334155' },
       labelLine: { length: 18, length2: 12 },
       itemStyle: { borderColor: '#fff', borderWidth: 3 }
     }]

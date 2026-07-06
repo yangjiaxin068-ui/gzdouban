@@ -1,33 +1,36 @@
 {% extends "base.html" %}
-{% block title %}评论词云{% endblock %}
+{% block title %}评论词云 - 电影数据分析系统{% endblock %}
 {% block content %}
 <div class="app-page">
-    <div class="page-head">
+    <section class="page-head">
         <div>
-            <div class="page-kicker">Word Cloud</div>
+            <span class="eyebrow">Word Cloud</span>
             <h1 class="page-title">评论词云</h1>
             <p class="page-subtitle">输入电影名后，根据对应评论内容生成词云图。</p>
         </div>
-    </div>
+    </section>
 
-    <div class="toolbar-card">
-        <form method="post" action="/comments_c" class="search-form">
-            <input name="searchIpt" type="text" class="form-control" placeholder="请输入电影名字">
+    <section class="toolbar-card">
+        <form method="post" action="{{ url_for('comments_c') }}" class="search-form">
+            <input name="searchIpt" type="text" class="form-control" placeholder="输入电影名">
             <button type="submit" class="btn btn-primary px-4">
-                <i class="fas fa-cloud me-1"></i>
+                <i class="fas fa-cloud"></i>
                 生成词云
             </button>
         </form>
-    </div>
+    </section>
 
-    <div class="card">
-        <div class="card-header">
+    <section class="panel-card">
+        <div class="panel-title">
+            <div>
+                <span class="eyebrow">Comments</span>
+                <h2>评论关键词</h2>
+            </div>
             <i class="fas fa-comments"></i>
-            评论关键词
         </div>
-        <div class="card-body wordcloud-stage">
-            <img src="/static/images/comments.png" alt="评论词云">
+        <div class="wordcloud-stage">
+            <img src="{{ url_for('static', filename='images/comments.png') }}" alt="评论词云">
         </div>
-    </div>
+    </section>
 </div>
 {% endblock %}

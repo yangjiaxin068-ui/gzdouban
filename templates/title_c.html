@@ -1,22 +1,25 @@
 {% extends "base.html" %}
-{% block title %}标题词云{% endblock %}
+{% block title %}标题词云 - 电影数据分析系统{% endblock %}
 {% block content %}
 <div class="app-page">
-    <div class="page-head">
+    <section class="page-head">
         <div>
-            <div class="page-kicker">Word Cloud</div>
+            <span class="eyebrow">Word Cloud</span>
             <h1 class="page-title">标题词云</h1>
-            <p class="page-subtitle">根据电影标题实时生成词云图。</p>
+            <p class="page-subtitle">根据电影标题实时生成词云图，每次访问都会重新生成。</p>
         </div>
-    </div>
-    <div class="card">
-        <div class="card-header">
+    </section>
+    <section class="panel-card">
+        <div class="panel-title">
+            <div>
+                <span class="eyebrow">Title</span>
+                <h2>标题关键词</h2>
+            </div>
             <i class="fas fa-heading"></i>
-            标题关键词
         </div>
-        <div class="card-body wordcloud-stage">
-            <img src="/static/images/title.png" alt="标题词云">
+        <div class="wordcloud-stage">
+            <img src="{{ url_for('static', filename='images/title.png') }}" alt="标题词云">
         </div>
-    </div>
+    </section>
 </div>
 {% endblock %}

@@ -1,21 +1,24 @@
 {% extends "base.html" %}
-{% block title %}数据表{% endblock %}
+{% block title %}数据表 - 电影数据分析系统{% endblock %}
 {% block content %}
 <div class="app-page">
-    <div class="page-head">
+    <section class="page-head">
         <div>
-            <div class="page-kicker">Dataset</div>
+            <span class="eyebrow">Dataset</span>
             <h1 class="page-title">电影数据表</h1>
-            <p class="page-subtitle">查看已采集电影的核心字段，点击片名进入搜索详情。</p>
+            <p class="page-subtitle">查看已采集电影的核心字段，点击片名可以进入检索详情页。</p>
         </div>
-    </div>
+    </section>
 
-    <div class="card table-card">
-        <div class="card-header">
+    <section class="panel-card table-card">
+        <div class="panel-title">
+            <div>
+                <span class="eyebrow">Records</span>
+                <h2>电影明细</h2>
+            </div>
             <i class="fas fa-table"></i>
-            电影明细
         </div>
-        <div class="card-body">
+        <div class="table-wrap">
             <table id="datatablesSimple">
                 <thead>
                 <tr>
@@ -38,10 +41,10 @@
                 <tr>
                     <td>{{ item[0] }}</td>
                     <td>
-                        <a class="fw-bold text-primary" href="/search/{{ item[0] }}">{{ item[3] }}</a>
+                        <a class="table-title-link" href="{{ url_for('search', searchId=item[0]) }}">{{ item[3] }}</a>
                     </td>
                     <td>
-                        <a target="_blank" href="{{ item[16] }}">
+                        <a target="_blank" href="{{ item[16] }}" rel="noopener">
                             <img class="table-cover" src="{{ url_for('movie_cover', movie_id=item[0]) }}" alt="{{ item[3] }}">
                         </a>
                     </td>
@@ -59,6 +62,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </section>
 </div>
 {% endblock %}

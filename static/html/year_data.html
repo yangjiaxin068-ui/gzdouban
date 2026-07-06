@@ -8,11 +8,11 @@
     
 </head>
 <body >
-    <div id="4a491b43579347ee8cf8c65d377a5427" class="chart-container" style="width:100%; height:100%; "></div>
+    <div id="35707e860b444aec8ea01ef4e95001b4" class="chart-container" style="width:100%; height:100%; "></div>
     <script>
-        var chart_4a491b43579347ee8cf8c65d377a5427 = echarts.init(
-            document.getElementById('4a491b43579347ee8cf8c65d377a5427'), 'white', {renderer: 'canvas', locale: 'ZH'});
-        var option_4a491b43579347ee8cf8c65d377a5427 = {
+        var chart_35707e860b444aec8ea01ef4e95001b4 = echarts.init(
+            document.getElementById('35707e860b444aec8ea01ef4e95001b4'), 'white', {renderer: 'canvas', locale: 'ZH'});
+        var option_35707e860b444aec8ea01ef4e95001b4 = {
     "animation": true,
     "animationThreshold": 2000,
     "animationDuration": 1000,
@@ -41,7 +41,7 @@
             "stackStrategy": "samesign",
             "cursor": "pointer",
             "barMinHeight": 0,
-            "barCategoryGap": "20%",
+            "barCategoryGap": "42%",
             "barGap": "30%",
             "large": false,
             "largeThreshold": 400,
@@ -51,11 +51,8 @@
             "zlevel": 0,
             "z": 2,
             "label": {
-                "show": true,
-                "color": "#dffaff",
-                "rotate": 45,
+                "show": false,
                 "margin": 8,
-                "fontSize": 12,
                 "richInheritPlainLabel": true,
                 "valueAnimation": false
             },
@@ -78,6 +75,7 @@
             "selected": {},
             "show": true,
             "left": "center",
+            "top": "0",
             "padding": 5,
             "itemGap": 10,
             "itemWidth": 25,
@@ -108,7 +106,7 @@
         "trigger": "axis",
         "triggerOn": "mousemove|click",
         "axisPointer": {
-            "type": "cross"
+            "type": "shadow"
         },
         "showContent": true,
         "alwaysShowContent": false,
@@ -132,19 +130,28 @@
             "name": "\u5e74\u4efd",
             "show": true,
             "scale": false,
-            "nameLocation": "middle",
-            "nameGap": 25,
+            "nameLocation": "end",
+            "nameGap": 15,
             "nameTruncate": {},
             "nameMoveOverlap": true,
             "nameTextStyle": {
-                "color": "#8bd3e6",
+                "color": "#93d9ea",
                 "richInheritPlainLabel": true
+            },
+            "axisLine": {
+                "show": true,
+                "onZero": true,
+                "onZeroAxisIndex": 0,
+                "lineStyle": {
+                    "show": false,
+                    "color": "rgba(190, 244, 255, 0.18)"
+                }
             },
             "axisLabel": {
                 "show": true,
-                "color": "#8bd3e6",
+                "color": "#93d9ea",
                 "margin": 8,
-                "fontSize": 12,
+                "fontSize": 11,
                 "richInheritPlainLabel": true,
                 "valueAnimation": false
             },
@@ -182,19 +189,19 @@
             "name": "\u6570\u91cf",
             "show": true,
             "scale": false,
-            "nameLocation": "middle",
-            "nameGap": 25,
+            "nameLocation": "end",
+            "nameGap": 15,
             "nameTruncate": {},
             "nameMoveOverlap": true,
             "nameTextStyle": {
-                "color": "#8bd3e6",
+                "color": "#93d9ea",
                 "richInheritPlainLabel": true
             },
             "axisLabel": {
                 "show": true,
-                "color": "#8bd3e6",
+                "color": "#93d9ea",
                 "margin": 8,
-                "fontSize": 12,
+                "fontSize": 11,
                 "richInheritPlainLabel": true,
                 "valueAnimation": false
             },
@@ -234,9 +241,9 @@
         }
     ]
 };
-        chart_4a491b43579347ee8cf8c65d377a5427.setOption(option_4a491b43579347ee8cf8c65d377a5427);
+        chart_35707e860b444aec8ea01ef4e95001b4.setOption(option_35707e860b444aec8ea01ef4e95001b4);
             window.addEventListener('resize', function(){
-                chart_4a491b43579347ee8cf8c65d377a5427.resize();
+                chart_35707e860b444aec8ea01ef4e95001b4.resize();
             })
     </script>
 </body>

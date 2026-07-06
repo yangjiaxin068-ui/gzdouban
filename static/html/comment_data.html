@@ -8,11 +8,11 @@
     
 </head>
 <body >
-    <div id="44c6abaee1874ffb85f243b3c0703e50" class="chart-container" style="width:100%; height:100%; "></div>
+    <div id="61d13a395e7f458d9c70165beefa2529" class="chart-container" style="width:100%; height:100%; "></div>
     <script>
-        var chart_44c6abaee1874ffb85f243b3c0703e50 = echarts.init(
-            document.getElementById('44c6abaee1874ffb85f243b3c0703e50'), 'white', {renderer: 'canvas', locale: 'ZH'});
-        var option_44c6abaee1874ffb85f243b3c0703e50 = {
+        var chart_61d13a395e7f458d9c70165beefa2529 = echarts.init(
+            document.getElementById('61d13a395e7f458d9c70165beefa2529'), 'white', {renderer: 'canvas', locale: 'ZH'});
+        var option_61d13a395e7f458d9c70165beefa2529 = {
     "animation": true,
     "animationThreshold": 2000,
     "animationDuration": 1000,
@@ -31,7 +31,7 @@
             "connectNulls": false,
             "xAxisIndex": 0,
             "symbol": "circle",
-            "symbolSize": 8,
+            "symbolSize": 7,
             "showSymbol": true,
             "smooth": true,
             "clip": true,
@@ -76,7 +76,7 @@
                 "opacity": 0
             },
             "itemStyle": {
-                "color": "#22d3ee"
+                "color": "#ffd166"
             },
             "zlevel": 0,
             "z": 0
@@ -90,6 +90,7 @@
             "selected": {},
             "show": true,
             "left": "center",
+            "top": "0",
             "padding": 5,
             "itemGap": 10,
             "itemWidth": 25,
@@ -144,20 +145,29 @@
             "name": "\u7535\u5f71",
             "show": true,
             "scale": false,
-            "nameLocation": "middle",
-            "nameGap": 35,
+            "nameLocation": "end",
+            "nameGap": 15,
             "nameTruncate": {},
             "nameMoveOverlap": true,
             "nameTextStyle": {
-                "color": "#8bd3e6",
+                "color": "#93d9ea",
                 "richInheritPlainLabel": true
+            },
+            "axisLine": {
+                "show": true,
+                "onZero": true,
+                "onZeroAxisIndex": 0,
+                "lineStyle": {
+                    "show": false,
+                    "color": "rgba(190, 244, 255, 0.18)"
+                }
             },
             "axisLabel": {
                 "show": true,
-                "color": "#8bd3e6",
-                "rotate": 20,
+                "color": "#93d9ea",
+                "rotate": 18,
                 "margin": 8,
-                "fontSize": 12,
+                "fontSize": 11,
                 "richInheritPlainLabel": true,
                 "valueAnimation": false
             },
@@ -195,20 +205,19 @@
             "name": "\u4e07\u6761",
             "show": true,
             "scale": false,
-            "nameLocation": "middle",
-            "nameGap": 45,
+            "nameLocation": "end",
+            "nameGap": 15,
             "nameTruncate": {},
             "nameMoveOverlap": true,
             "nameTextStyle": {
-                "color": "#8bd3e6",
+                "color": "#93d9ea",
                 "richInheritPlainLabel": true
             },
             "axisLabel": {
                 "show": true,
-                "color": "#8bd3e6",
+                "color": "#93d9ea",
                 "margin": 8,
-                "fontSize": 12,
-                "formatter": "{value}",
+                "fontSize": 11,
                 "richInheritPlainLabel": true,
                 "valueAnimation": false
             },
@@ -248,9 +257,9 @@
         }
     ]
 };
-        chart_44c6abaee1874ffb85f243b3c0703e50.setOption(option_44c6abaee1874ffb85f243b3c0703e50);
+        chart_61d13a395e7f458d9c70165beefa2529.setOption(option_61d13a395e7f458d9c70165beefa2529);
             window.addEventListener('resize', function(){
-                chart_44c6abaee1874ffb85f243b3c0703e50.resize();
+                chart_61d13a395e7f458d9c70165beefa2529.resize();
             })
     </script>
 </body>
