@@ -1,171 +1,76 @@
 {% extends "base.html" %}
-{% block title %}演员信息{% endblock %}
-{% block stylecontent %}
-<link href="/static/css/styles.css" rel="stylesheet"/>
-{% endblock %}
+{% block title %}演员导演{% endblock %}
 {% block content %}
-<main>
-    <div class="container-fluid px-4">
-        <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item"></li>
-        </ol>
-        <div class="card mb-4">
+<div class="app-page">
+    <div class="page-head">
+        <div>
+            <div class="page-kicker">People</div>
+            <h1 class="page-title">演员与导演分析</h1>
+            <p class="page-subtitle">统计出现频率较高的导演和演员，观察数据中的核心创作者。</p>
+        </div>
+    </div>
+
+    <div class="chart-grid">
+        <div class="card">
             <div class="card-header">
-                <i class="fas fa-chart-area me-1"></i>
-                导演作品数量前20
+                <i class="fas fa-video"></i>
+                导演作品数量 Top 20
             </div>
             <div class="card-body">
-                <div id="mainOne" style="width: 100%;height: 450px;"></div>
+                <div id="directorChart" class="chart-box chart-tall"></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-users"></i>
+                演员参演数量 Top 20
+            </div>
+            <div class="card-body">
+                <div id="actorChart" class="chart-box chart-tall"></div>
             </div>
         </div>
     </div>
-</main>
-<main>
-    <div class="container-fluid px-4">
-        <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item"></li>
-        </ol>
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="fas fa-chart-area me-1"></i>
-                演员参演排名前20
-            </div>
-            <div class="card-body">
-                <div id="mainTwo" style="width: 100%;height: 450px;"></div>
-            </div>
-        </div>
-    </div>
-</main>
+</div>
 {% endblock %}
+
 {% block scriptcontent %}
-
 <script>
-  // 导演作品数量前20
-  var chartDom = document.getElementById('mainOne')
-  var myChart = echarts.init(chartDom)
-  var option
-  option = {
-    //标题
-    title: {
-      text: ' 导演作品数量前20',
-      left: 'center',
-      textStyle: {
-        color: '#2f7add',
-        fontSize: 16,
+  const directorChart = echarts.init(document.getElementById('directorChart'));
+  const actorChart = echarts.init(document.getElementById('actorChart'));
+
+  const peopleBarOption = function (names, values, color, seriesName) {
+    return {
+      color: [color],
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      grid: { left: 118, right: 28, top: 32, bottom: 34 },
+      xAxis: {
+        type: 'value',
+        name: '数量',
+        splitLine: { lineStyle: { color: '#eef2f7' } },
+        axisLabel: { color: '#667085' }
       },
-    },
-    //提示框
-    tooltip: {
-      trigger: 'axis',
-      textStyle: {
-        color: '#000',
+      yAxis: {
+        type: 'category',
+        data: names,
+        axisLabel: { color: '#344054' },
+        axisLine: { lineStyle: { color: '#d0d5dd' } }
       },
-      axisPointer: {
-        type: 'cross',
-      },
-    },
-    //图例
-    legend: {
-      orient: 'vertical',
-      left: 'right',
-    },
-    //横轴信息
-    xAxis: {
-      type: 'value',
-      name: '数量',
-    },
-    //纵轴信息
-    yAxis: {
-      type: 'category',
-      data: {{ x | safe }},
-      name: '导演',
-    },
-    //缩放
-    dataZoom: {
-      type: 'inside',
-      start: 0,
-      orient: 'vertical',
-    },
-    //系列列表
-    series: [
-      {
-        name: '作品数量',
+      series: [{
+        name: seriesName,
         type: 'bar',
-        data:{{ y | safe }},
-        showBackground: true,
-        backgroundStyle: {
-          color: 'rgba(212,192,220,0.5)',
-        },
-        itemStyle: {
-          color: 'rgba(26,66,152,0.8)',
-        },
-        //设置动画效果
-        animationDuration: 5000,
-        animationEasing: 'cubicOut',
-      }],
-  }
-  option && myChart.setOption(option)
-</script>
+        data: values,
+        barWidth: 14,
+        itemStyle: { borderRadius: [0, 8, 8, 0] }
+      }]
+    };
+  };
 
-<script>
-  //演员参演排名前20
-  var chartDom = document.getElementById('mainTwo')
-  var myChart = echarts.init(chartDom)
-  var option
-  option = {
-    //标题
-    title: {
-      text: '',
-      left: 'center',
-      textStyle: {
-        color: '#2f7add',
-        fontSize: 16,
-      },
-    },
-    //提示框
-    tooltip: {
-      trigger: 'axis',
-      textStyle: {
-        color: '#000',
-      },
-    },
-    //图例
-    legend: {
-      orient: 'vertical',
-      left: 'right',
-    },
-    //横轴信息
-    xAxis: {
-      type: 'category',
-      data: {{ x1 | safe }},
-      boundaryGap: false,
-      name: '演员',
-    },
-    //纵轴信息
-    yAxis: {
-      type: 'value',
-      name: '数量',
-    },
-    //系列列表
-    series: [
-      {
-        name: '作品数量',
-        type: 'line',
-        data:{{ y1 | safe }},
-        areaStyle: {
-          color: 'rgba(136,172,216,0.5)',
-        },
-        lineStyle: {
-          color: 'rgba(22,113,24,0.5)',
-        },
-        itemStyle: {
-          color: 'rgba(62,22,184,0.5)',
-        },
-        //设置动画效果
-        animationDuration: 5000,
-        animationEasing: 'elasticOut',
-      }],
-  }
-  option && myChart.setOption(option)
+  directorChart.setOption(peopleBarOption({{ x | tojson }}, {{ y | tojson }}, '#2563eb', '导演作品数量'));
+  actorChart.setOption(peopleBarOption({{ x1 | tojson }}, {{ y1 | tojson }}, '#14b8a6', '演员参演数量'));
+
+  window.addEventListener('resize', function () {
+    directorChart.resize();
+    actorChart.resize();
+  });
 </script>
 {% endblock %}

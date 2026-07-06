@@ -1,250 +1,117 @@
 {% extends "base.html" %}
-{% block title %}时间信息{% endblock %}
-{% block stylecontent %}
-<link href="/static/css/styles.css" rel="stylesheet"/>
-{% endblock %}
+{% block title %}时间分析{% endblock %}
 {% block content %}
-<div class="container-fluid px-4">
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"></li>
-    </ol>
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-chart-area me-1"></i>
-            历年产量统计
-        </div>
-        <div class="card-body">
-            <div id="mainOne" style="width: 100%;height: 450px;"></div>
+<div class="app-page">
+    <div class="page-head">
+        <div>
+            <div class="page-kicker">Timeline</div>
+            <h1 class="page-title">电影时间分析</h1>
+            <p class="page-subtitle">按上映年份和片长区间查看电影数据分布。</p>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-chart-bar me-1"></i>
-                    电影数据时长分布占比(饼图)
-                </div>
-                <div class="card-body">
-                    <div id="mainTwo" style="width:100%;height: 600px;"></div>
-                </div>
+
+    <div class="chart-grid">
+        <div class="card chart-card-wide">
+            <div class="card-header">
+                <i class="fas fa-chart-bar"></i>
+                历年产量统计
+            </div>
+            <div class="card-body">
+                <div id="yearChart" class="chart-box"></div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-chart-bar me-1"></i>
-                    电影数据时长分布占比(漏斗图)
-                </div>
-                <div class="card-body">
-                    <div id="mainTwo2" style="width:100%;height: 600px;"></div>
-                </div>
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-pie"></i>
+                片长区间占比
+            </div>
+            <div class="card-body">
+                <div id="durationPieChart" class="chart-box"></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-filter"></i>
+                片长区间漏斗
+            </div>
+            <div class="card-body">
+                <div id="durationFunnelChart" class="chart-box"></div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
-{% block scriptcontent %}
 
+{% block scriptcontent %}
 <script>
-  //历年产量统计
-  var chartDom = document.getElementById('mainOne')
-  var myChart = echarts.init(chartDom)
-  var option
-  option = {
-    //标题
-    title: {
-      text: '历年产量统计',
-      left: 'center',
-      textStyle: {
-        color: '#2f7add',
-        fontSize: 16,
-      },
-    },
-    //提示框
-    tooltip: {
-      trigger: 'axis',
-      textStyle: {
-        color: '#000',
-      },
-      axisPointer: {
-        type: 'cross',
-      },
-    },
-    //图例
-    legend: {
-      orient: 'vertical',
-      left: 'right',
-    },
-    //横轴信息
+  const chartPalette = ['#2563eb', '#14b8a6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+  const yearChart = echarts.init(document.getElementById('yearChart'));
+  const durationPieChart = echarts.init(document.getElementById('durationPieChart'));
+  const durationFunnelChart = echarts.init(document.getElementById('durationFunnelChart'));
+  const durationData = {{ movieTimeData | tojson }};
+
+  yearChart.setOption({
+    color: ['#2563eb'],
+    tooltip: { trigger: 'axis' },
+    grid: { left: 54, right: 28, top: 42, bottom: 52 },
     xAxis: {
       type: 'category',
-      data: {{ x | safe }},
+      data: {{ x | tojson }},
       name: '年份',
+      axisLabel: { color: '#667085' },
+      axisLine: { lineStyle: { color: '#d0d5dd' } }
     },
-    //纵轴信息
     yAxis: {
       type: 'value',
       name: '数量',
+      axisLabel: { color: '#667085' },
+      splitLine: { lineStyle: { color: '#eef2f7' } }
     },
-    //系列列表
-    series: [
-      {
-        name: '数量',
-        type: 'bar',
-        data:{{ y | safe }},
-        showBackground: true,
-        backgroundStyle: {
-          color: 'rgba(212,192,220,0.5)',
-        },
-        itemStyle: {
-          color: 'rgba(61,227,49,0.8)',
-        },
-        //设置动画效果
-        animationDuration: 5000,
-        animationEasing: 'cubicOut',
-      }],
-  }
-  option && myChart.setOption(option)
+    series: [{
+      name: '电影数量',
+      type: 'bar',
+      data: {{ y | tojson }},
+      barWidth: 26,
+      itemStyle: { borderRadius: [6, 6, 0, 0] }
+    }]
+  });
+
+  durationPieChart.setOption({
+    color: chartPalette,
+    tooltip: { trigger: 'item', formatter: '{b}<br>{c} 部 ({d}%)' },
+    legend: { bottom: 0, left: 'center' },
+    series: [{
+      name: '片长区间',
+      type: 'pie',
+      radius: ['44%', '68%'],
+      center: ['50%', '45%'],
+      data: durationData,
+      label: { formatter: '{b}: {c}' }
+    }]
+  });
+
+  durationFunnelChart.setOption({
+    color: chartPalette,
+    tooltip: { trigger: 'item', formatter: '{b}<br>{c} 部' },
+    series: [{
+      name: '片长区间',
+      type: 'funnel',
+      left: '12%',
+      top: 38,
+      bottom: 36,
+      width: '76%',
+      sort: 'descending',
+      gap: 6,
+      data: durationData,
+      label: { formatter: '{b}: {c}', color: '#fff', fontWeight: 700 },
+      itemStyle: { borderColor: '#fff', borderWidth: 2 }
+    }]
+  });
+
+  window.addEventListener('resize', function () {
+    yearChart.resize();
+    durationPieChart.resize();
+    durationFunnelChart.resize();
+  });
 </script>
-
-<script>
-  //电影数据时长分布占比(饼图)
-  var chartDom = document.getElementById('mainTwo')
-  var myChart = echarts.init(chartDom)
-  var option
-  option = {
-    //标题
-    title: {
-      text: '电影数据时长分布占比(饼图)',
-      left: 'center',
-      textStyle: {
-        color: '#982cb6',
-        fontSize: 16,
-      },
-    },
-    //提示框
-    tooltip: {
-      trigger: 'item',
-      textStyle: {
-        color: '#83a843',
-      },
-    },
-    //图例
-    legend: {
-      type: 'plain',
-      orient: 'vertical',
-      left: 'left',
-      icon: 'pin',
-      itemWidth: 25,
-      itemHeight: 25,
-      textStyle: {
-        fontSize: 18,
-        color: '#00f',
-      },
-    },
-    //系列列表
-    series: [
-      {
-        name: '时长个数',
-        type: 'pie',
-        radius: ['40%', '60%'],
-        data: {{ movieTimeData | safe }},
-        label: {
-          show: true,
-          formatter: '{b}:{c}个:【{d}%】',
-          fontSize: 18,
-        },
-        labelLine: {
-          lineStyle: {
-            color: '#00f',
-          },
-        },
-        itemStyle: {
-          borderRadius: 10,
-          borderColor: '#000',
-          borderWidth: 2,
-        },
-        //设置动画效果
-        //animationType:'scale',
-        animationDuration: 5000,
-        animationEasing: 'elasticIn',
-      }],
-    //自定义颜色
-    color: ['#43cc49', '#1e3bd1', '#e4644d', '#a0ea08'],
-  }
-  option && myChart.setOption(option)
-</script>
-
-
-<script>
-  //电影数据时长分布占比(漏斗图)
-  var chartDom = document.getElementById('mainTwo2')
-  var myChart = echarts.init(chartDom)
-  var option
-  option = {
-    //标题
-    title: {
-      text: '电影数据时长分布占比(漏斗图)',
-      left: 'center',
-      textStyle: {
-        color: '#982cb6',
-        fontSize: 16,
-      },
-    },
-    //提示框
-    tooltip: {
-      trigger: 'item',
-      textStyle: {
-        color: '#83a843',
-      },
-    },
-    //图例
-    legend: {
-      type: 'plain',
-      orient: 'vertical',
-      left: 'left',
-      icon: 'arrow',
-      itemWidth: 20,
-      itemHeight: 20,
-      textStyle: {
-        fontSize: 16,
-        color: '#00f',
-      },
-    },
-    //系列列表
-    series: [
-      {
-        name: '时长个数',
-        type: 'funnel',
-        radius: ['40%', '60%'],
-        data: {{ movieTimeData | safe }},
-        label: {
-          show: true,
-          formatter: '{b}:{c}个',
-          fontSize: 18,
-          position: 'inner',
-        },
-        labelLine: {
-          lineStyle: {
-            color: '#00f',
-          },
-        },
-        itemStyle: {
-          borderRadius: 10,
-          borderColor: '#000',
-          borderWidth: 2,
-        },
-        //设置动画效果
-        //animationType:'scale',
-        animationDuration: 5000,
-        animationEasing: 'elasticIn',
-      }],
-    //自定义颜色
-    color: ['#42a3cc', '#7daf19', '#4a610f', '#a0ea08'],
-  }
-  option && myChart.setOption(option)
-</script>
-
 {% endblock %}

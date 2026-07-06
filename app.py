@@ -83,6 +83,30 @@ def fetch_douban_cover(url):
     return response.content if is_valid_jpeg(response.content) else None
 
 
+def serve_cached_douban_image(cache_name, image_urls):
+    cache_path = COVER_CACHE_DIR / cache_name
+    if cache_path.exists():
+        return Response(cache_path.read_bytes(), mimetype="image/jpeg")
+
+    image_content = None
+    for image_url in image_urls:
+        if not image_url:
+            continue
+        try:
+            image_content = fetch_douban_cover(image_url)
+        except requests.RequestException:
+            image_content = None
+        if image_content:
+            break
+
+    if not image_content:
+        return Response(status=404)
+
+    COVER_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_bytes(image_content)
+    return Response(image_content, mimetype="image/jpeg")
+
+
 @app.route("/")
 def rootRoute():
     return render_template("login.html")
@@ -200,6 +224,12 @@ def index():
     typeAll = getTypesAll()
     typeAll = len(typeAll)
     maxLang = getMaxLang()[:2]
+    country_x, country_y = getAddressData()
+    country_pairs = sorted(
+        zip(country_x, country_y),
+        key=lambda item: item[1],
+        reverse=True,
+    )[:10]
     data = {
         "allData": allData,
         "maxRate": maxRate,
@@ -214,6 +244,10 @@ def index():
         chart_html2=year_chart(),
         chart_html3=lang_chart(),
         chart_html4=comment_chart(),
+        country_data=[
+            {"name": name, "value": value}
+            for name, value in country_pairs
+        ],
     )
 
 
@@ -359,10 +393,6 @@ def tables(id):
 
 @app.route("/cover/<int:movie_id>")
 def movie_cover(movie_id):
-    cache_path = COVER_CACHE_DIR / f"{movie_id}.jpg"
-    if cache_path.exists():
-        return Response(cache_path.read_bytes(), mimetype="image/jpeg")
-
     conn, cursor = get_conn()
     try:
         cursor.execute("SELECT cover FROM dbo.movies WHERE id = ?", movie_id)
@@ -374,25 +404,11 @@ def movie_cover(movie_id):
     if not row or not row[0]:
         return Response(status=404)
 
-    try:
-        image_content = fetch_douban_cover(row[0])
-    except requests.RequestException:
-        return Response(status=404)
-
-    if not image_content:
-        return Response(status=404)
-
-    COVER_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_path.write_bytes(image_content)
-    return Response(image_content, mimetype="image/jpeg")
+    return serve_cached_douban_image(f"{movie_id}.jpg", [row[0]])
 
 
 @app.route("/movie_image/<int:movie_id>/<int:image_index>")
 def movie_image(movie_id, image_index):
-    cache_path = COVER_CACHE_DIR / f"{movie_id}_{image_index}.jpg"
-    if cache_path.exists():
-        return Response(cache_path.read_bytes(), mimetype="image/jpeg")
-
     conn, cursor = get_conn()
     try:
         cursor.execute("SELECT imgList, cover FROM dbo.movies WHERE id = ?", movie_id)
@@ -406,23 +422,7 @@ def movie_image(movie_id, image_index):
 
     image_urls = safe_split(row[0], [])
     image_url = image_urls[image_index] if 0 <= image_index < len(image_urls) else row[1]
-    if not image_url:
-        return Response(status=404)
-
-    try:
-        image_content = fetch_douban_cover(image_url)
-    except requests.RequestException:
-        try:
-            image_content = fetch_douban_cover(row[1]) if row[1] else None
-        except requests.RequestException:
-            image_content = None
-
-    if not image_content:
-        return Response(status=404)
-
-    COVER_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_path.write_bytes(image_content)
-    return Response(image_content, mimetype="image/jpeg")
+    return serve_cached_douban_image(f"{movie_id}_{image_index}.jpg", [image_url, row[1]])
 
 
 @app.route("/title_c")

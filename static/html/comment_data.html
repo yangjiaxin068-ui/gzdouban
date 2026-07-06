@@ -8,11 +8,11 @@
     
 </head>
 <body >
-    <div id="fd46722fd5f94d9e9045bc71b893c8f1" class="chart-container" style="width:100%; height:100%; "></div>
+    <div id="c6f601d4e6e1466f823634f204b29123" class="chart-container" style="width:100%; height:100%; "></div>
     <script>
-        var chart_fd46722fd5f94d9e9045bc71b893c8f1 = echarts.init(
-            document.getElementById('fd46722fd5f94d9e9045bc71b893c8f1'), 'white', {renderer: 'canvas', locale: 'ZH'});
-        var option_fd46722fd5f94d9e9045bc71b893c8f1 = {
+        var chart_c6f601d4e6e1466f823634f204b29123 = echarts.init(
+            document.getElementById('c6f601d4e6e1466f823634f204b29123'), 'white', {renderer: 'canvas', locale: 'ZH'});
+        var option_c6f601d4e6e1466f823634f204b29123 = {
     "animation": true,
     "animationThreshold": 2000,
     "animationDuration": 1000,
@@ -27,7 +27,7 @@
     "series": [
         {
             "type": "line",
-            "name": "\u8bc4\u8bba\u6570\u91cf",
+            "name": "\u8bc4\u8bba\u6570\u91cf(\u4e07)",
             "connectNulls": false,
             "xAxisIndex": 0,
             "symbol": "circle",
@@ -40,31 +40,28 @@
             "data": [
                 [
                     "\u8096\u7533\u514b\u7684\u6551\u8d4e",
-                    3300156
+                    330.0
                 ],
                 [
-                    "\u8fd9\u4e2a\u6740\u624b\u4e0d\u592a\u51b7",
-                    2561672
+                    "\u8fd9\u4e2a\u6740\u624b\u4e0d\u592a...",
+                    256.2
                 ],
                 [
                     "\u5343\u4e0e\u5343\u5bfb",
-                    2549422
+                    254.9
                 ],
                 [
                     "\u6cf0\u5766\u5c3c\u514b\u53f7",
-                    2511147
+                    251.1
                 ],
                 [
                     "\u963f\u7518\u6b63\u4f20",
-                    2440706
+                    244.1
                 ]
             ],
-            "hoverAnimation": true,
             "label": {
-                "show": true,
-                "color": "#0f0",
+                "show": false,
                 "margin": 8,
-                "fontSize": 12,
                 "richInheritPlainLabel": true,
                 "valueAnimation": false
             },
@@ -88,7 +85,7 @@
     "legend": [
         {
             "data": [
-                "\u8bc4\u8bba\u6570\u91cf"
+                "\u8bc4\u8bba\u6570\u91cf(\u4e07)"
             ],
             "selected": {},
             "show": true,
@@ -186,7 +183,7 @@
             "animationDelayUpdate": 0,
             "data": [
                 "\u8096\u7533\u514b\u7684\u6551\u8d4e",
-                "\u8fd9\u4e2a\u6740\u624b\u4e0d\u592a\u51b7",
+                "\u8fd9\u4e2a\u6740\u624b\u4e0d\u592a...",
                 "\u5343\u4e0e\u5343\u5bfb",
                 "\u6cf0\u5766\u5c3c\u514b\u53f7",
                 "\u963f\u7518\u6b63\u4f20"
@@ -195,7 +192,7 @@
     ],
     "yAxis": [
         {
-            "name": "\u6570\u91cf",
+            "name": "\u4e07\u6761",
             "show": true,
             "scale": false,
             "nameLocation": "middle",
@@ -211,6 +208,7 @@
                 "color": "#0f0",
                 "margin": 8,
                 "fontSize": 12,
+                "formatter": "{value}",
                 "richInheritPlainLabel": true,
                 "valueAnimation": false
             },
@@ -249,9 +247,9 @@
         }
     ]
 };
-        chart_fd46722fd5f94d9e9045bc71b893c8f1.setOption(option_fd46722fd5f94d9e9045bc71b893c8f1);
+        chart_c6f601d4e6e1466f823634f204b29123.setOption(option_c6f601d4e6e1466f823634f204b29123);
             window.addEventListener('resize', function(){
-                chart_fd46722fd5f94d9e9045bc71b893c8f1.resize();
+                chart_c6f601d4e6e1466f823634f204b29123.resize();
             })
     </script>
 </body>

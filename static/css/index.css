@@ -63,7 +63,7 @@ header h1 {
     height: 6.9rem;
     width: 7.8rem;
     border: 1px solid rgba(25, 186, 139, 0.17);
-rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.04);
     padding: 0 0.1887rem 0.5189rem;
     margin-bottom: 0.1887rem;
 }
@@ -260,6 +260,53 @@ rgba(255, 255, 255, 0.04);
     height: 9.9rem;
     margin: auto 0.1321rem;
     overflow: hidden;
+    border: 1px solid rgba(25, 186, 139, 0.17);
+    background: rgba(4, 18, 56, 0.52);
+}
+
+.map-title {
+    height: 0.6rem;
+    color: #fff;
+    line-height: 0.6rem;
+    text-align: center;
+    font-size: 0.25rem;
+}
+
+.globe-wrap {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 0.6rem);
+}
+
+#globeCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.globe-rank {
+    position: absolute;
+    right: 0.25rem;
+    bottom: 0.25rem;
+    width: 2.3rem;
+    padding: 0.13rem;
+    border: 1px solid rgba(34, 211, 238, 0.25);
+    background: rgba(2, 13, 42, 0.58);
+}
+
+.globe-rank li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.12rem;
+    height: 0.34rem;
+    color: rgba(223, 250, 255, 0.9);
+    font-size: 0.17rem;
+}
+
+.globe-rank strong {
+    color: #7df9ff;
+    font-weight: 700;
 }
 
 .map .chart {

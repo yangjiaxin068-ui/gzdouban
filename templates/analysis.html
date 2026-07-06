@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <script src="{{ url_for('static', filename='js/flexible.js') }}"></script>
     <script src="{{ url_for('static', filename='js/echarts.js') }}"></script>
-    <script src="https://assets.pyecharts.org/assets/v6/echarts-liquidfill.min.js"></script>
     <style>
         .chart-slot {
             width: 100%;
@@ -79,8 +78,18 @@
             </div>
         </div>
         <div class="map">
-            <iframe src="{{ url_for('static', filename='html/map3d.html') }}"
-                    style="width: 100%; height: 100%; border: none;"></iframe>
+            <div class="map-title">制片地区分布</div>
+            <div class="globe-wrap">
+                <canvas id="globeCanvas" aria-label="制片地区地球"></canvas>
+                <ul class="globe-rank">
+                    {% for item in country_data[:5] %}
+                    <li>
+                        <span>{{ item.name }}</span>
+                        <strong>{{ item.value }}</strong>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
     <div class="column">
@@ -100,10 +109,10 @@
         <div class="no">
             <div class="no-bd">
                 <ul>
-                    <li>好好学习</li>
-                    <li>天天向上</li>
-                    <li>GOOD GOOD STUDY</li>
-                    <li>DAY DAY UP</li>
+                    <li>数据采集</li>
+                    <li>数据清洗</li>
+                    <li>可视化分析</li>
+                    <li>词云输出</li>
                 </ul>
             </div>
         </div>
@@ -112,5 +121,172 @@
 <section>
  <!--底部信息-->
 </section>
+<script>
+    const countryData = {{ country_data | tojson }};
+    const countryCoords = {
+        '中国大陆': [104, 35],
+        '中国香港': [114, 22],
+        '中国台湾': [121, 24],
+        '美国': [-98, 39],
+        '英国': [-3, 55],
+        '日本': [138, 36],
+        '韩国': [128, 36],
+        '法国': [2, 46],
+        '加拿大': [-106, 56],
+        '德国': [10, 51],
+        '澳大利亚': [134, -25],
+        '印度': [78, 22],
+        '意大利': [12, 43],
+        '西班牙': [-4, 40],
+        '泰国': [101, 15],
+        '俄罗斯': [100, 60]
+    };
+
+    const globeCanvas = document.getElementById('globeCanvas');
+    const globeCtx = globeCanvas.getContext('2d');
+    let globeRotation = 0;
+    let globeDpr = window.devicePixelRatio || 1;
+
+    function resizeGlobe() {
+        const box = globeCanvas.getBoundingClientRect();
+        globeDpr = window.devicePixelRatio || 1;
+        globeCanvas.width = Math.max(1, Math.floor(box.width * globeDpr));
+        globeCanvas.height = Math.max(1, Math.floor(box.height * globeDpr));
+    }
+
+    function projectPoint(lon, lat, radius, centerX, centerY) {
+        const rad = Math.PI / 180;
+        const lambda = (lon + globeRotation) * rad;
+        const phi = lat * rad;
+        const x = radius * Math.cos(phi) * Math.sin(lambda);
+        const y = -radius * Math.sin(phi);
+        const z = radius * Math.cos(phi) * Math.cos(lambda);
+        return {
+            x: centerX + x,
+            y: centerY + y,
+            visible: z > -radius * 0.05,
+            depth: z / radius
+        };
+    }
+
+    function drawProjectedLine(points, radius, centerX, centerY) {
+        globeCtx.beginPath();
+        let drawing = false;
+        points.forEach(([lon, lat]) => {
+            const point = projectPoint(lon, lat, radius, centerX, centerY);
+            if (!point.visible) {
+                drawing = false;
+                return;
+            }
+            if (!drawing) {
+                globeCtx.moveTo(point.x, point.y);
+                drawing = true;
+            } else {
+                globeCtx.lineTo(point.x, point.y);
+            }
+        });
+        globeCtx.stroke();
+    }
+
+    function drawGlobe() {
+        const width = globeCanvas.width;
+        const height = globeCanvas.height;
+        const centerX = width * 0.48;
+        const centerY = height * 0.52;
+        const radius = Math.min(width, height) * 0.36;
+
+        globeCtx.clearRect(0, 0, width, height);
+        globeCtx.save();
+        globeCtx.scale(globeDpr, globeDpr);
+        globeCtx.restore();
+
+        const gradient = globeCtx.createRadialGradient(
+            centerX - radius * 0.28,
+            centerY - radius * 0.35,
+            radius * 0.1,
+            centerX,
+            centerY,
+            radius
+        );
+        gradient.addColorStop(0, 'rgba(125, 249, 255, 0.95)');
+        gradient.addColorStop(0.48, 'rgba(17, 130, 255, 0.7)');
+        gradient.addColorStop(1, 'rgba(0, 24, 90, 0.95)');
+
+        globeCtx.beginPath();
+        globeCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        globeCtx.fillStyle = gradient;
+        globeCtx.fill();
+
+        globeCtx.save();
+        globeCtx.beginPath();
+        globeCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        globeCtx.clip();
+
+        globeCtx.strokeStyle = 'rgba(173, 244, 255, 0.34)';
+        globeCtx.lineWidth = 1.2 * globeDpr;
+        for (let lat = -60; lat <= 60; lat += 30) {
+            const line = [];
+            for (let lon = -180; lon <= 180; lon += 4) {
+                line.push([lon, lat]);
+            }
+            drawProjectedLine(line, radius, centerX, centerY);
+        }
+
+        for (let lon = -150; lon <= 180; lon += 30) {
+            const line = [];
+            for (let lat = -80; lat <= 80; lat += 4) {
+                line.push([lon, lat]);
+            }
+            drawProjectedLine(line, radius, centerX, centerY);
+        }
+
+        countryData.forEach((item, index) => {
+            const coord = countryCoords[item.name];
+            if (!coord) {
+                return;
+            }
+            const point = projectPoint(coord[0], coord[1], radius, centerX, centerY);
+            if (!point.visible) {
+                return;
+            }
+            const pulse = 1 + Math.sin(Date.now() / 360 + index) * 0.22;
+            const dotRadius = (4 + Math.min(item.value, 120) / 42) * pulse * globeDpr;
+            globeCtx.beginPath();
+            globeCtx.arc(point.x, point.y, dotRadius * 2.1, 0, Math.PI * 2);
+            globeCtx.fillStyle = 'rgba(34, 211, 238, 0.16)';
+            globeCtx.fill();
+            globeCtx.beginPath();
+            globeCtx.arc(point.x, point.y, dotRadius, 0, Math.PI * 2);
+            globeCtx.fillStyle = '#7df9ff';
+            globeCtx.fill();
+
+            if (index < 4) {
+                globeCtx.font = `${12 * globeDpr}px Microsoft YaHei, sans-serif`;
+                globeCtx.fillStyle = '#dffaff';
+                globeCtx.fillText(`${item.name} ${item.value}`, point.x + 8 * globeDpr, point.y - 8 * globeDpr);
+            }
+        });
+        globeCtx.restore();
+
+        globeCtx.beginPath();
+        globeCtx.arc(centerX, centerY, radius + 1 * globeDpr, 0, Math.PI * 2);
+        globeCtx.strokeStyle = 'rgba(125, 249, 255, 0.75)';
+        globeCtx.lineWidth = 2 * globeDpr;
+        globeCtx.stroke();
+
+        globeCtx.beginPath();
+        globeCtx.ellipse(centerX, centerY, radius * 1.1, radius * 0.28, -0.12, 0, Math.PI * 2);
+        globeCtx.strokeStyle = 'rgba(125, 249, 255, 0.22)';
+        globeCtx.lineWidth = 1.5 * globeDpr;
+        globeCtx.stroke();
+
+        globeRotation = (globeRotation + 0.22) % 360;
+        requestAnimationFrame(drawGlobe);
+    }
+
+    resizeGlobe();
+    drawGlobe();
+    window.addEventListener('resize', resizeGlobe);
+</script>
 </body>
 </html>

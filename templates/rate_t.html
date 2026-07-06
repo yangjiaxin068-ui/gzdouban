@@ -1,406 +1,208 @@
 {% extends "base.html" %}
-{% block title %}评分{% endblock %}
-{% block stylecontent %}
-<link href="/static/css/styles.css" rel="stylesheet"/>
-{% endblock %}
+{% block title %}评分分析{% endblock %}
 {% block content %}
-<div class="container-fluid px-4">
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"></li>
-    </ol>
-    <h5 class="mt-2">电影类型选择</h5>
-    <div class="card mb-4">
-        <div class="card-body" style="align-items: center">
-            <div class="btn-group" role="group" aria-label="Basic example">
-                {% if type == 'all' %}
-                <a href="/rate_t/all" class="btn btn-secondary active">全部</a>
-                {% else %}
-                <a href="/rate_t/all" class="btn btn-secondary ">全部</a>
-                {% endif %}
-                {% for i in typeAll %}
-                {% if type == i %}
-                <a href="/rate_t/{{ i }}" class="active btn btn-secondary">{{ i }}</a>
-                {% else %}
-                <a href="/rate_t/{{ i }}" class="btn btn-secondary">{{ i }}</a>
-                {% endif %}
-                {% endfor %}
-            </div>
+<div class="app-page">
+    <div class="page-head">
+        <div>
+            <div class="page-kicker">Rating</div>
+            <h1 class="page-title">电影评分分析</h1>
+            <p class="page-subtitle">查看评分分布、星级占比、年度均分和主要地区评分情况。</p>
         </div>
     </div>
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-chart-area me-1"></i>
-            电影评分统计
-        </div>
-        <div class="card-body">
-            <div id="mainOne" style="width: 100%;height: 400px"></div>
+
+    <div class="toolbar-card">
+        <div class="toolbar-label">类型筛选</div>
+        <div class="type-filter">
+            <a href="{{ url_for('rate_t', type='all') }}" class="btn {% if type == 'all' %}btn-primary{% else %}btn-outline-app{% endif %}">全部</a>
+            {% for item in typeAll %}
+            <a href="{{ url_for('rate_t', type=item) }}" class="btn {% if type == item %}btn-primary{% else %}btn-outline-app{% endif %}">{{ item }}</a>
+            {% endfor %}
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-chart-bar me-6"></i>
-                    豆瓣评分星级饼状图
-                </div>
-                <div class="card-body">
-                    <form method="post" action="/rate_t/all">
-                        <div class="input-group">
-                            <input name="searchIpt" type="text" class="form-control" placeholder="请输入电影名关键字">
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-primary">
-                                    搜索
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <hr>
-                <div class="card-body">
-                    <div id="mainTwo" style="width: 100%;height: 400px;">
-                    </div>
-                </div>
+
+    <div class="chart-grid">
+        <div class="card chart-card-wide">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i>
+                评分分布趋势
             </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-chart-bar me-1"></i>
-                    豆瓣年度评价评分柱状图
-                </div>
-                <div class="card-body">
-                    <div id="mainThree" style="width: 100%;height: 500px;">
-                    </div>
-                </div>
+            <div class="card-body">
+                <div id="rateTrendChart" class="chart-box"></div>
             </div>
         </div>
 
-    </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-chart-bar me-1"></i>
-                    豆瓣电影中外评分分布图
-                </div>
-                <div class="card-body">
-                    <div id="mainFour" style="width:100%;height:500px;">
-                    </div>
-                </div>
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-star"></i>
+                电影星级占比
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('rate_t', type=type) }}" class="search-form mb-3">
+                    <input name="searchIpt" type="text" class="form-control" placeholder="输入电影名查看星级占比">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i>
+                        查询
+                    </button>
+                </form>
+                <div class="chart-note">{{ movieName or '默认展示第一部匹配电影' }}</div>
+                <div id="starChart" class="chart-box"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-calendar-alt"></i>
+                年度平均评分
+            </div>
+            <div class="card-body">
+                <div id="yearMeanChart" class="chart-box"></div>
+            </div>
+        </div>
+
+        <div class="card chart-card-wide">
+            <div class="card-header">
+                <i class="fas fa-globe-asia"></i>
+                地区电影数量与平均评分
+            </div>
+            <div class="card-body">
+                <div id="countryRatingChart" class="chart-box"></div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
+
 {% block scriptcontent %}
 <script>
-  //电影评分折线图
-  var chartDom = document.getElementById('mainOne')
-  var myChart = echarts.init(chartDom)
-  var option
-  option = {
-    //标题
-    title: {
-      text: '电影评分统计',
-      left: 'center',
-      textStyle: {
-        color: '#2f7add',
-        fontSize: 16,
-      },
-    },
-    //提示框
-    tooltip: {
-      trigger: 'axis',
-      textStyle: {
-        color: '#000',
-      },
-      axisPointer: {
-        type: 'cross',
-      },
-    },
-    //图例
-    legend: {
-      orient: 'vertical',
-      left: 'right',
-      icon: 'pin',
-    },
-    //横轴信息
+  const rateTrendChart = echarts.init(document.getElementById('rateTrendChart'));
+  const starChart = echarts.init(document.getElementById('starChart'));
+  const yearMeanChart = echarts.init(document.getElementById('yearMeanChart'));
+  const countryRatingChart = echarts.init(document.getElementById('countryRatingChart'));
+
+  rateTrendChart.setOption({
+    color: ['#2563eb'],
+    tooltip: { trigger: 'axis' },
+    grid: { left: 50, right: 28, top: 34, bottom: 48 },
     xAxis: {
       type: 'category',
-      data: {{ x | safe }},
+      data: {{ x | tojson }},
       boundaryGap: false,
       name: '分数',
+      axisLabel: { color: '#667085' },
+      axisLine: { lineStyle: { color: '#d0d5dd' } }
     },
-    //纵轴信息
     yAxis: {
       type: 'value',
       name: '数量',
+      splitLine: { lineStyle: { color: '#eef2f7' } },
+      axisLabel: { color: '#667085' }
     },
-    //系列列表
-    series: [
-      {
-        name: '数量',
-        type: 'line',
-        data:{{ y | safe }},
-        areaStyle: {
-          color: 'rgba(103,182,71,0.5)',
-        },
-        lineStyle: {
-          color: 'rgba(60,131,175,0.5)',
-        },
-        itemStyle: {
-          color: 'rgba(68,13,228,0.5)',
-        },
-        //设置动画效果
-        animationDuration: 5000,
-        animationEasing: 'elasticOut',
-      }],
-  }
-  option && myChart.setOption(option)
-</script>
-<script>
-  var chartDom = document.getElementById('mainTwo')
-  var myChart = echarts.init(chartDom)
-  var option
-  option = {
-    //标题
-    title: {
-      text: '{{ movieName }}-电影评分星级饼状图',
-      left: 'center',
-      textStyle: {
-        color: '#982cb6',
-        fontSize: 16,
-      },
-    },
-    //提示框
-    tooltip: {
-      trigger: 'item',
-      textStyle: {
-        color: '#83a843',
-      },
-    },
-    //图例
-    legend: {
-      type: 'plain',
-      orient: 'vertical',
-      left: 'left',
-      icon: 'rect',
-      itemWidth: 25,
-      itemHeight: 25,
-      textStyle: {
-        fontSize: 18,
-        color: '#00f',
-      },
-    },
-    //系列列表
-    series: [
-      {
-        name: '时长个数',
-        type: 'pie',
-        radius: ['40%', '60%'],
-        center: ['55%', '55%'],
-        data: {{ star | safe }},
-        label: {
-          show: true,
-          formatter: '{b}:[{d}%]',
-          fontSize: 14,
-        },
-        labelLine: {
-          lineStyle: {
-            color: '#00f',
-          },
-        },
-        itemStyle: {
-          borderRadius: 10,
-          borderColor: '#0f0',
-          borderWidth: 2,
-        },
-        //设置动画效果
-        //animationType:'scale',
-        animationDuration: 5000,
-        animationEasing: 'elasticIn',
-      }],
-    //自定义颜色
-    color: ['#1a1db3', '#d6b67c', '#21b52e', '#3a1906'],
-  }
-  option && myChart.setOption(option)
-</script>
-<script>
-  //豆瓣年度评价评分柱状图
-  var chartDom = document.getElementById('mainThree')
-  var myChart = echarts.init(chartDom)
-  var option
-  option = {
-    //标题
-    title: {
-      text: '年度评价评分柱状图',
-      left: 'center',
-      textStyle: {
-        color: '#2f7add',
-        fontSize: 16,
-      },
-    },
-    //提示框
-    tooltip: {
-      trigger: 'axis',
-      textStyle: {
-        color: '#000',
-      },
-      axisPointer: {
-        type: 'cross',
-      },
-    },
-    //图例
-    legend: {
-      orient: 'vertical',
-      left: 'right',
-    },
-    //横轴信息
+    series: [{
+      name: '电影数量',
+      type: 'line',
+      smooth: true,
+      data: {{ y | tojson }},
+      areaStyle: { color: 'rgba(37, 99, 235, 0.12)' },
+      lineStyle: { width: 3 }
+    }]
+  });
+
+  starChart.setOption({
+    color: ['#2563eb', '#14b8a6', '#f59e0b', '#ef4444', '#8b5cf6'],
+    tooltip: { trigger: 'item', formatter: '{b}<br>{c}%' },
+    legend: { bottom: 0, left: 'center' },
+    series: [{
+      name: '星级占比',
+      type: 'pie',
+      radius: ['42%', '68%'],
+      center: ['50%', '45%'],
+      data: {{ star | tojson }},
+      label: { formatter: '{b}: {c}%' },
+      itemStyle: { borderColor: '#fff', borderWidth: 3 }
+    }]
+  });
+
+  yearMeanChart.setOption({
+    color: ['#14b8a6'],
+    tooltip: { trigger: 'axis' },
+    dataZoom: [{ type: 'inside', start: 60 }],
+    grid: { left: 50, right: 28, top: 34, bottom: 48 },
     xAxis: {
       type: 'category',
       data: {{ x1 | tojson }},
       name: '年份',
+      axisLabel: { color: '#667085' },
+      axisLine: { lineStyle: { color: '#d0d5dd' } }
     },
-    //纵轴信息
-    yAxis: [{
+    yAxis: {
       type: 'value',
-      name: '数量',
-    }],
-    //缩放
-    dataZoom:{
-      type: 'inside',
-      start: 80,
+      name: '平均分',
+      min: 0,
+      max: 10,
+      splitLine: { lineStyle: { color: '#eef2f7' } },
+      axisLabel: { color: '#667085' }
     },
-    //系列列表
-    series: [
-      {
-        name: '数量',
-        type: 'bar',
-        data:{{ y1 | tojson }},
-        showBackground: true,
-        backgroundStyle: {
-          color: 'rgba(212,192,220,0.5)',
-        },
-        itemStyle: {
-          color: 'rgba(61,227,49,0.8)',
-        },
-        //设置动画效果
-        animationDuration: 5000,
-        animationEasing: 'cubicOut',
-      }],
-  }
-  option && myChart.setOption(option)
-</script>
+    series: [{
+      name: '平均分',
+      type: 'bar',
+      data: {{ y1 | tojson }},
+      barWidth: 18,
+      itemStyle: { borderRadius: [6, 6, 0, 0] }
+    }]
+  });
 
-<script>
-    var chartDom = document.getElementById('mainFour')
-    var myChart = echarts.init(chartDom)
-    var option
-    option = {
-      //标题
-      title: {
-        text: '',
-        left: 'center',
-        textStyle: {
-          color: '#982cb6',
-          fontSize: 16,
-        },
-      },
-      //提示框
-      tooltip: {
-        trigger: 'axis',
-        textStyle: {
-          color: '#83a843',
-        },
-        axisPointer: {
-          type: 'cross',
-        }
-      },
-      //图例
-      legend: {
-        type: 'plain',
-        orient: 'vertical',
-        left: 'left',
-        icon: 'pin',
-      },
-      //横轴信息
-      xAxis: {
-        type: 'category',
-        data: {{ x2 | tojson }},
-        name: '地点',
+  countryRatingChart.setOption({
+    color: ['#2563eb', '#f59e0b'],
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    legend: { top: 0, right: 20 },
+    grid: { left: 56, right: 58, top: 46, bottom: 48 },
+    xAxis: {
+      type: 'category',
+      data: {{ x2 | tojson }},
+      axisLabel: { color: '#667085' },
+      axisLine: { lineStyle: { color: '#d0d5dd' } }
     },
-    //纵轴信息
-    yAxis:[
-      //左侧
+    yAxis: [
       {
         type: 'value',
         name: '电影数量',
+        splitLine: { lineStyle: { color: '#eef2f7' } },
+        axisLabel: { color: '#667085' }
       },
-      //右侧
       {
         type: 'value',
-        name: '平均分数',
+        name: '平均分',
+        min: 0,
+        max: 10,
+        axisLabel: { color: '#667085' }
       }
     ],
-    //工具箱
-    toolbox: {
-        orient: 'vertical',
-        left: 'right',
-        feature: {
-          dataZoom: {},
-          dataView: {},
-          restore: {},
-          saveAsImage: {},
-          magicType: {
-            type: ['bar', 'line', 'stack'],
-          }
-      }
-    },
-    //系列列表
-    series:[
-        //左侧y轴，电影数量，柱状图
+    series: [
       {
-        name:'电影数量',
-        type:'bar',
+        name: '电影数量',
+        type: 'bar',
         yAxisIndex: 0,
-        data:{{ y2 | tojson }},
-        showBackground: true,
-        backgroundStyle: {
-          color: 'rgba(246,242,248,0.8)',
-        },
-        itemStyle: {
-            color: 'rgba(11,227,49,0.8)',
-        },
-        label:{
-          show: true,
-          rotate:45,
-          textStyle: {
-            color: '#000',
-          }
-        },
-        //设置动画效果
-        animationDuration: 5000,
-        animationEasing: 'cubicOut',
+        data: {{ y2 | tojson }},
+        barWidth: 28,
+        itemStyle: { borderRadius: [6, 6, 0, 0] }
       },
-        //右侧y轴，平均分数，折线图
       {
-        name:'平均分数',
-        type:'line',
+        name: '平均分',
+        type: 'line',
         yAxisIndex: 1,
-        data:{{ y22 | tojson }},
-        lineStyle: {
-          color: 'rgba(32,26,202,0.8)',
-        },
-        itemStyle: {
-          color: 'rgba(78,17,170,0.8)',
-        },
-        //设置动画效果
-        animationDuration: 5000,
-        animationEasing: 'elasticIn',
+        smooth: true,
+        data: {{ y22 | tojson }},
+        lineStyle: { width: 3 },
+        symbolSize: 8
       }
     ]
-    }
-    option && myChart.setOption(option)
-</script>
+  });
 
+  window.addEventListener('resize', function () {
+    rateTrendChart.resize();
+    starChart.resize();
+    yearMeanChart.resize();
+    countryRatingChart.resize();
+  });
+</script>
 {% endblock %}

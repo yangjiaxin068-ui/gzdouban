@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 from pyecharts import options as opts
-from pyecharts.charts import Bar, Grid, Line, Liquid, Pie
+from pyecharts.charts import Bar, Line, Pie
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -40,6 +40,7 @@ def _normalize_chart_fragment(html_text):
         'class="chart-container" style="width:100%; height:100%;"',
         fragment,
     )
+    fragment = re.sub(r'\s*"hoverAnimation":\s*true,\n', "\n", fragment)
 
     chart_names = re.findall(r"var\s+(chart_[a-zA-Z0-9_]+)\s*=", fragment)
     if chart_names:
@@ -63,7 +64,12 @@ def chart_from_file(filename):
 
 
 def _render_chart(chart, filename):
-    chart.render(str(HTML_DIR / filename))
+    output_path = HTML_DIR / filename
+    chart.render(str(output_path))
+    output_path.write_text(
+        re.sub(r'\s*"hoverAnimation":\s*true,\n', "\n", output_path.read_text(encoding="utf-8")),
+        encoding="utf-8",
+    )
     return _normalize_chart_fragment(chart.render_embed())
 
 
@@ -76,7 +82,7 @@ def type_chart():
         radius=["30%", "60%"],
         label_opts=opts.LabelOpts(
             formatter="{b}:{c}个",
-            font_size=16,
+            font_size=15,
             font_style="bold",
             color="#0f0",
         ),
@@ -131,68 +137,46 @@ def lang_chart():
     if not pairs:
         pairs = [("暂无", 0)]
 
-    total = sum(count for _, count in pairs) or 1
-    while len(pairs) < 2:
-        pairs.append(("", 0))
-
-    first_name, first_count = pairs[0]
-    second_name, second_count = pairs[1]
-
-    first = Liquid(init_opts=opts.InitOpts(height="100%", width="100%"))
-    first.add(
-        "占比",
-        [first_count / total],
-        center=["25%", "50%"],
-        color=["#0f0"],
-        is_outline_show=False,
-        shape="pin",
-        label_opts=opts.LabelOpts(font_size=32),
+    pie = Pie(init_opts=opts.InitOpts(height="100%", width="100%"))
+    pie.add(
+        "数量",
+        pairs,
+        radius=["42%", "70%"],
+        center=["50%", "50%"],
+        label_opts=opts.LabelOpts(formatter="{b}: {d}%", color="#0f0", font_size=16),
     )
-    first.set_global_opts(
-        title_opts=opts.TitleOpts(
-            title=first_name[:2],
-            pos_left="20%",
-            pos_top="5%",
-            title_textstyle_opts=opts.TextStyleOpts(color="#0f0"),
-        )
+    pie.set_global_opts(
+        title_opts=opts.TitleOpts(title=""),
+        tooltip_opts=opts.TooltipOpts(trigger="item", formatter="{b}: {c}部 ({d}%)"),
+        legend_opts=opts.LegendOpts(
+            pos_bottom="0",
+            pos_left="center",
+            textstyle_opts=opts.TextStyleOpts(color="#0f0", font_size=14),
+        ),
     )
-
-    second = Liquid(init_opts=opts.InitOpts(height="100%", width="100%"))
-    second.add(
-        "占比",
-        [second_count / total],
-        center=["70%", "50%"],
-        color=["#0f0"],
-        is_outline_show=False,
-        shape="pin",
-        label_opts=opts.LabelOpts(font_size=32),
+    pie.set_series_opts(
+        itemstyle_opts=opts.ItemStyleOpts(border_color="#071d5f", border_width=2)
     )
-    second.set_global_opts(
-        title_opts=opts.TitleOpts(
-            title=second_name[:2],
-            pos_left="65%",
-            pos_top="5%",
-            title_textstyle_opts=opts.TextStyleOpts(color="#0f0"),
-        )
-    )
-
-    grid = Grid(init_opts=opts.InitOpts(height="100%", width="100%"))
-    grid.add(first, grid_opts=opts.GridOpts())
-    grid.add(second, grid_opts=opts.GridOpts())
-    return _render_chart(grid, "lang_data.html")
+    pie.set_colors(["#00f5ff", "#67e8f9", "#22c55e", "#facc15"])
+    return _render_chart(pie, "lang_data.html")
 
 
 def comment_chart():
     movies, counts = _read_count_csv("comment_counts.csv")
+    display_movies = [
+        f"{name[:6]}..." if len(name) > 6 else name
+        for name in movies
+    ]
+    counts_in_wan = [round(count / 10000, 1) for count in counts]
     line = Line(init_opts=opts.InitOpts(height="100%", width="100%"))
-    line.add_xaxis(movies)
+    line.add_xaxis(display_movies)
     line.add_yaxis(
-        "评论数量",
-        counts,
+        "评论数量(万)",
+        counts_in_wan,
         is_smooth=True,
         symbol="circle",
         symbol_size=8,
-        label_opts=opts.LabelOpts(color="#0f0", font_size=12),
+        label_opts=opts.LabelOpts(is_show=False),
         linestyle_opts=opts.LineStyleOpts(color="#0ff", width=3),
         itemstyle_opts=opts.ItemStyleOpts(color="#0ff"),
     )
@@ -206,9 +190,9 @@ def comment_chart():
             name_gap=35,
         ),
         yaxis_opts=opts.AxisOpts(
-            name="数量",
+            name="万条",
             name_textstyle_opts=opts.TextStyleOpts(color="#0f0"),
-            axislabel_opts=opts.LabelOpts(color="#0f0", font_size=12),
+            axislabel_opts=opts.LabelOpts(color="#0f0", font_size=12, formatter="{value}"),
             name_location="middle",
             name_gap=45,
         ),
