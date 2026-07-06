@@ -70,7 +70,9 @@
                     </td>
                     <td style="text-align: center;width: 150px">
                         <a target="_blank" href="{{ item[16] }}">
-                            <img style="width: 75%;object-fit:cover;height:150px;" src="{{ item[5] }}" alt="">
+                            <img style="width: 75%;object-fit:cover;height:150px;"
+                                 src="{{ url_for('movie_cover', movie_id=item[0]) }}"
+                                 alt="{{ item[3] }}">
                         </a>
                     </td>
                     <td><span class="text-primary">{{ item[2] }}分</span></td>

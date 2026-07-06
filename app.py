@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, redirect, render_template, request, session, url_for
+import requests
+from flask import Flask, Response, redirect, render_template, request, session, url_for
+from pathlib import Path
+import re
 
 from tools.actor import *
 from tools.addressData import *
@@ -8,10 +11,52 @@ from tools.homeData import *
 from tools.rateData import *
 from tools.timeData import *
 from tools.typeData import *
-
+from tools.word_cloud import *
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = "ywqqq"
+BASE_DIR = Path(__file__).resolve().parent
+COVER_CACHE_DIR = BASE_DIR / "static" / "images" / "covers"
+
+
+def extract_douban_image_cookies(html_text):
+    status_parts = re.findall(r"(?:WTKkN|bOYDu|wyeCN)\s*:\s*(\d+)", html_text)
+    bot_match = re.search(r"\(t,\s*(\d{8,})\)", html_text)
+    if len(status_parts) < 3 or not bot_match:
+        return None
+
+    status_value = sum(int(value) for value in status_parts)
+    return f"__tst_status={status_value}#; EO_Bot_Ssid={bot_match.group(1)}"
+
+
+def is_valid_jpeg(content):
+    return content.startswith(b"\xff\xd8") and len(content) > 1024
+
+
+def fetch_douban_cover(url):
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/134.0.0.0 Safari/537.36"
+        ),
+        "Referer": "https://movie.douban.com/",
+        "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
+    if is_valid_jpeg(response.content):
+        return response.content
+
+    cookie = extract_douban_image_cookies(response.text)
+    if not cookie:
+        response.raise_for_status()
+        return response.content if is_valid_jpeg(response.content) else None
+
+    headers["Cookie"] = cookie
+    response = requests.get(url, headers=headers, timeout=10)
+    response.raise_for_status()
+    return response.content if is_valid_jpeg(response.content) else None
 
 
 @app.route("/")
@@ -263,6 +308,71 @@ def actor_t():
         x1=list(x1),
         y1=list(y1),
     )
+
+
+@app.route("/tables/<int:id>")
+def tables(id):
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    username = session["username"]
+    tablelist = []
+    if id == 0:
+        tablelist = getTableList()
+
+    return render_template("tables.html", username=username, tablelist=tablelist)
+
+
+@app.route("/cover/<int:movie_id>")
+def movie_cover(movie_id):
+    cache_path = COVER_CACHE_DIR / f"{movie_id}.jpg"
+    if cache_path.exists():
+        return Response(cache_path.read_bytes(), mimetype="image/jpeg")
+
+    conn, cursor = get_conn()
+    try:
+        cursor.execute("SELECT cover FROM dbo.movies WHERE id = ?", movie_id)
+        row = cursor.fetchone()
+    finally:
+        cursor.close()
+        conn.close()
+
+    if not row or not row[0]:
+        return Response(status=404)
+
+    try:
+        image_content = fetch_douban_cover(row[0])
+    except requests.RequestException:
+        return Response(status=404)
+
+    if not image_content:
+        return Response(status=404)
+
+    COVER_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_bytes(image_content)
+    return Response(image_content, mimetype="image/jpeg")
+
+
+@app.route("/title_c")
+def title_c():
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    username = session["username"]
+    output_path = BASE_DIR / "static" / "images" / "title.png"
+    getTitleImg("title", "fas fa-heart", str(output_path))
+    return render_template("title_c.html", username=username)
+
+
+@app.route("/casts_c")
+def casts_c():
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    username = session["username"]
+    output_path = BASE_DIR / "static" / "images" / "casts.png"
+    getCastsImg("casts", "fab fa-apple", str(output_path))
+    return render_template("casts_c.html", username=username)
 
 
 if __name__ == "__main__":

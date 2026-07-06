@@ -10,5 +10,6 @@ venv/
 
 spider/douban_cookie.txt
 backups/
+static/images/covers/
 
 *.log
