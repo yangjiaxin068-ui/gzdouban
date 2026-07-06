@@ -1,22 +1,45 @@
 # -*- coding: utf-8 -*-
 import requests
 from flask import Flask, Response, redirect, render_template, request, session, url_for
+from functools import wraps
 from pathlib import Path
 import re
 
-from tools.actor import *
-from tools.addressData import *
+from tools.actor import getAllActorMovieNum, getAllDirectorMovieNum
+from tools.addressData import getAddressData, getLangData
+from tools.dashboard_charts import comment_chart, lang_chart, type_chart, year_chart
+from tools.getData import mainFun
 from tools.getDataBase import get_conn
-from tools.homeData import *
-from tools.rateData import *
-from tools.timeData import *
-from tools.typeData import *
-from tools.word_cloud import *
+from tools.homeData import (
+    getAllData,
+    getMaxCast,
+    getMaxLang,
+    getMaxRate,
+    getRate_t,
+    getTableList,
+    getType_t,
+    getTypesAll,
+)
+from tools.rateData import getCountryRating, getMean, getRate_tType, getStart
+from tools.timeData import getMovieTimeList, getTimeList
+from tools.typeData import getMovieTypeData
+from tools.word_cloud import getCastsImg, getCommentsImg, getTitleImg
+
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = "ywqqq"
 BASE_DIR = Path(__file__).resolve().parent
 COVER_CACHE_DIR = BASE_DIR / "static" / "images" / "covers"
+
+
+def login_required(view_func):
+    @wraps(view_func)
+    def wrapped_view(*args, **kwargs):
+        if "username" not in session:
+            return redirect(url_for("login"))
+        return view_func(*args, **kwargs)
+
+    return wrapped_view
 
 
 def extract_douban_image_cookies(html_text):
@@ -141,10 +164,8 @@ def logout():
 
 
 @app.route("/home")
+@login_required
 def home():
-    if "username" not in session:
-        return redirect(url_for("login"))
-
     username = session["username"]
     allData = getAllData()
     dataLen = len(allData)
@@ -169,11 +190,35 @@ def home():
     )
 
 
-@app.route("/search/<int:searchId>", methods=["GET", "POST"])
-def search(searchId):
-    if "username" not in session:
-        return redirect(url_for("login"))
+@app.route("/analysis1", methods=["GET", "POST"])
+@login_required
+def index():
+    allData = getAllData()
+    allData = len(allData)
+    maxRate = getMaxRate()
+    typeAll = getTypesAll()
+    typeAll = len(typeAll)
+    maxLang = getMaxLang()[:2]
+    data = {
+        "allData": allData,
+        "maxRate": maxRate,
+        "typeAll": typeAll,
+        "maxLang": maxLang,
+    }
+    return render_template(
+        "analysis.html",
+        username=session["username"],
+        data=data,
+        chart_html1=type_chart(),
+        chart_html2=year_chart(),
+        chart_html3=lang_chart(),
+        chart_html4=comment_chart(),
+    )
 
+
+@app.route("/search/<int:searchId>", methods=["GET", "POST"])
+@login_required
+def search(searchId):
     username = session["username"]
     allData = getAllData()
     data = []
@@ -197,10 +242,8 @@ def search(searchId):
 
 
 @app.route("/time_t")
+@login_required
 def time_t():
-    if "username" not in session:
-        return redirect(url_for("login"))
-
     username = session["username"]
     x, y = getTimeList()
     movieTimeData = getMovieTimeList()
@@ -215,10 +258,8 @@ def time_t():
 
 
 @app.route("/rate_t/<type>", methods=["GET", "POST"])
+@login_required
 def rate_t(type):
-    if "username" not in session:
-        return redirect(url_for("login"))
-
     username = session["username"]
     typeAll = list(getTypesAll())
 
@@ -260,10 +301,8 @@ def rate_t(type):
 
 
 @app.route("/address_t")
+@login_required
 def address_t():
-    if "username" not in session:
-        return redirect(url_for("login"))
-
     username = session["username"]
     x, y = getAddressData()
     x1, y1 = getLangData()
@@ -279,10 +318,8 @@ def address_t():
 
 
 @app.route("/type_t")
+@login_required
 def type_t():
-    if "username" not in session:
-        return redirect(url_for("login"))
-
     username = session["username"]
     result = getMovieTypeData()
     data = sorted(result, key=lambda item: item["value"], reverse=True)
@@ -292,10 +329,8 @@ def type_t():
 
 
 @app.route("/actor_t")
+@login_required
 def actor_t():
-    if "username" not in session:
-        return redirect(url_for("login"))
-
     username = session["username"]
     x, y = getAllDirectorMovieNum()
     x1, y1 = getAllActorMovieNum()
@@ -311,10 +346,8 @@ def actor_t():
 
 
 @app.route("/tables/<int:id>")
+@login_required
 def tables(id):
-    if "username" not in session:
-        return redirect(url_for("login"))
-
     username = session["username"]
     tablelist = []
     if id == 0:
@@ -354,10 +387,8 @@ def movie_cover(movie_id):
 
 
 @app.route("/title_c")
+@login_required
 def title_c():
-    if "username" not in session:
-        return redirect(url_for("login"))
-
     username = session["username"]
     output_path = BASE_DIR / "static" / "images" / "title.png"
     getTitleImg("title", "fas fa-heart", str(output_path))
@@ -365,15 +396,37 @@ def title_c():
 
 
 @app.route("/casts_c")
+@login_required
 def casts_c():
-    if "username" not in session:
-        return redirect(url_for("login"))
-
     username = session["username"]
     output_path = BASE_DIR / "static" / "images" / "casts.png"
     getCastsImg("casts", "fab fa-apple", str(output_path))
     return render_template("casts_c.html", username=username)
 
 
+@app.route("/comments_c", methods=["GET", "POST"])
+@login_required
+def comments_c():
+    username = session["username"]
+    if request.method == "GET":
+        return render_template("comments_c.html", username=username)
+
+    searchWord = request.form.get("searchIpt", "").strip()
+    if not searchWord:
+        return redirect(url_for("comments_c"))
+
+    try:
+        output_path = BASE_DIR / "static" / "images" / "comments.png"
+        has_data = getCommentsImg("commentContent", searchWord, "fab fa-qq", str(output_path))
+        if not has_data:
+            return redirect(url_for("comments_c"))
+    except Exception:
+        return redirect(url_for("comments_c"))
+
+    return render_template("comments_c.html", username=username)
+
+
 if __name__ == "__main__":
+    with app.app_context():
+        mainFun()
     app.run(debug=True, port=9898)

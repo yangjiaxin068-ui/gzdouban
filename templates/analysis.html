@@ -6,6 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>豆瓣电影数据可视化</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <script src="{{ url_for('static', filename='js/flexible.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/echarts.js') }}"></script>
+    <script src="https://assets.pyecharts.org/assets/v6/echarts-liquidfill.min.js"></script>
+    <style>
+        .chart-slot {
+            width: 100%;
+            height: calc(100% - 0.65rem);
+            overflow: hidden;
+        }
+
+        .chart-slot .chart-container {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
 </head>
 <body>
 <header>
@@ -35,11 +50,11 @@
     <div class="column">
         <div class="panel">
             <h2>电影类型TOP5</h2>
-            {{ chart_html1 | safe }}
+            <div class="chart-slot">{{ chart_html1 | safe }}</div>
         </div>
         <div class="panel">
             <h2>中英文电影占比</h2>
-            {{ chart_html3 | safe }}
+            <div class="chart-slot">{{ chart_html3 | safe }}</div>
         </div>
     </div>
     <div class="column">
@@ -71,11 +86,11 @@
     <div class="column">
         <div class="panel">
             <h2>年份电影数据量</h2>
-            {{ chart_html2 | safe }}
+            <div class="chart-slot">{{ chart_html2 | safe }}</div>
         </div>
         <div class="panel">
             <h2>电影评论数折线图</h2>
-            {{ chart_html4 | safe }}
+            <div class="chart-slot">{{ chart_html4 | safe }}</div>
         </div>
     </div>
 </section>
@@ -97,11 +112,5 @@
 <section>
  <!--底部信息-->
 </section>
-<script src="{{ url_for('static', filename='js/flexible.js') }}"></script>
-<script src="{{ url_for('static', filename='js/echarts.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/china.js') }}"></script>
-<script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
-<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 </body>
 </html>

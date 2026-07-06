@@ -84,12 +84,28 @@ def getCastsImg(field, icon_name, output_name):
 
 def getCommentsImg(field, serchWord, icon_name, output_name):
     field = _validate_field(field, ALLOWED_COMMENT_FIELDS)
+    search_word = str(serchWord or "").strip()
+    if not search_word:
+        return False
+
     conn, cursor = get_conn()
     try:
-        cursor.execute(f"SELECT {field} FROM dbo.comments WHERE movieName = ?", serchWord)
-        text = _join_rows(cursor.fetchall())
+        cursor.execute(
+            f"""
+            SELECT {field}
+            FROM dbo.comments
+            WHERE REPLACE(REPLACE(movieName, '>', ''), NCHAR(160), '') LIKE ?
+            """,
+            f"%{search_word}%",
+        )
+        rows = cursor.fetchall()
+        text = _join_rows(rows)
     finally:
         cursor.close()
         conn.close()
 
+    if not text:
+        return False
+
     _make_word_cloud(text, icon_name, output_name, split_chars=True)
+    return True
