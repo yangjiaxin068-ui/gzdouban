@@ -21,6 +21,9 @@
     var trackedMarkers = [];
     var baseRotationY = THREE.Math.degToRad(-104);
     var textureRotationY = THREE.Math.degToRad(-84);
+    var autoRotationSpeed = THREE.Math.degToRad(5.2);
+    var cloudRotationSpeed = THREE.Math.degToRad(6.8);
+    var baseTiltX = THREE.Math.degToRad(18);
     var clock = new THREE.Clock();
 
     var countryCoords = {
@@ -299,7 +302,7 @@
         earthGroup.add(atmosphere);
 
         addMarkers(makeDotTexture());
-        earthGroup.rotation.x = THREE.Math.degToRad(18);
+        earthGroup.rotation.x = baseTiltX;
         earthGroup.rotation.y = baseRotationY;
 
         return { clouds: clouds };
@@ -334,8 +337,9 @@
     function render() {
         var elapsed = clock.getElapsedTime();
         if (!reduceMotion) {
-            earthGroup.rotation.y = baseRotationY + Math.sin(elapsed * 0.14) * 0.045;
-            sceneParts.clouds.rotation.y += 0.0008;
+            earthGroup.rotation.y = baseRotationY + elapsed * autoRotationSpeed;
+            earthGroup.rotation.x = baseTiltX + Math.sin(elapsed * 0.34) * THREE.Math.degToRad(1.4);
+            sceneParts.clouds.rotation.y = textureRotationY + elapsed * cloudRotationSpeed;
         }
         updateMarkerVisibility();
         renderer.render(scene, camera);
