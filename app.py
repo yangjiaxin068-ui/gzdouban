@@ -19,6 +19,7 @@ from tools.homeData import (
     getTableList,
     getType_t,
     getTypesAll,
+    safe_split,
 )
 from tools.rateData import getCountryRating, getMean, getRate_tType, getStart
 from tools.timeData import getMovieTimeList, getTimeList
@@ -377,6 +378,44 @@ def movie_cover(movie_id):
         image_content = fetch_douban_cover(row[0])
     except requests.RequestException:
         return Response(status=404)
+
+    if not image_content:
+        return Response(status=404)
+
+    COVER_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_bytes(image_content)
+    return Response(image_content, mimetype="image/jpeg")
+
+
+@app.route("/movie_image/<int:movie_id>/<int:image_index>")
+def movie_image(movie_id, image_index):
+    cache_path = COVER_CACHE_DIR / f"{movie_id}_{image_index}.jpg"
+    if cache_path.exists():
+        return Response(cache_path.read_bytes(), mimetype="image/jpeg")
+
+    conn, cursor = get_conn()
+    try:
+        cursor.execute("SELECT imgList, cover FROM dbo.movies WHERE id = ?", movie_id)
+        row = cursor.fetchone()
+    finally:
+        cursor.close()
+        conn.close()
+
+    if not row:
+        return Response(status=404)
+
+    image_urls = safe_split(row[0], [])
+    image_url = image_urls[image_index] if 0 <= image_index < len(image_urls) else row[1]
+    if not image_url:
+        return Response(status=404)
+
+    try:
+        image_content = fetch_douban_cover(image_url)
+    except requests.RequestException:
+        try:
+            image_content = fetch_douban_cover(row[1]) if row[1] else None
+        except requests.RequestException:
+            image_content = None
 
     if not image_content:
         return Response(status=404)

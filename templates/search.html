@@ -20,7 +20,15 @@
     <div class="card" style="width: 100%;margin-bottom: 20px">
         <div style="margin-left: 15px;margin-top: 15px">
             {% for imgSrc in item[15] %}
-            <img src="{{ imgSrc }}" class="rounded" alt="...">
+            <img src="{{ url_for('movie_image', movie_id=item[0], image_index=loop.index0) }}"
+                 class="rounded"
+                 style="width: 110px;height: 110px;object-fit: cover;margin-right: 8px;"
+                 alt="{{ item[3] }}">
+            {% else %}
+            <img src="{{ url_for('movie_cover', movie_id=item[0]) }}"
+                 class="rounded"
+                 style="width: 110px;height: 110px;object-fit: cover;margin-right: 8px;"
+                 alt="{{ item[3] }}">
             {% endfor %}
         </div>
         <div class="card-body">
