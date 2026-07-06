@@ -9,11 +9,11 @@
     
 </head>
 <body >
-    <div id="a7ca46e94ab6494e978c95775e715b3e" class="chart-container" style="width:900px; height:500px; "></div>
+    <div id="cb08bd9fbad74603b3770456aef92983" class="chart-container" style="width:100%; height:100%; "></div>
     <script>
-        var chart_a7ca46e94ab6494e978c95775e715b3e = echarts.init(
-            document.getElementById('a7ca46e94ab6494e978c95775e715b3e'), 'white', {renderer: 'canvas', locale: 'ZH'});
-        var option_a7ca46e94ab6494e978c95775e715b3e = {
+        var chart_cb08bd9fbad74603b3770456aef92983 = echarts.init(
+            document.getElementById('cb08bd9fbad74603b3770456aef92983'), 'white', {renderer: 'canvas', locale: 'ZH'});
+        var option_cb08bd9fbad74603b3770456aef92983 = {
     "animation": true,
     "animationThreshold": 2000,
     "animationDuration": 1000,
@@ -30,7 +30,7 @@
             "type": "liquidFill",
             "name": "\u5360\u6bd4",
             "data": [
-                0.5794871794871795
+                0.5223880597014925
             ],
             "waveAnimation": true,
             "animationDuration": 2000,
@@ -47,13 +47,13 @@
             "label": {
                 "show": true,
                 "margin": 8,
-                "fontSize": 40,
+                "fontSize": 32,
                 "richInheritPlainLabel": true,
                 "valueAnimation": false
             },
             "center": [
-                "15%",
-                "35%"
+                "25%",
+                "50%"
             ],
             "xAxisIndex": 0,
             "yAxisIndex": 0
@@ -62,7 +62,7 @@
             "type": "liquidFill",
             "name": "\u5360\u6bd4",
             "data": [
-                0.4205128205128205
+                0.47761194029850745
             ],
             "waveAnimation": true,
             "animationDuration": 2000,
@@ -79,13 +79,13 @@
             "label": {
                 "show": true,
                 "margin": 8,
-                "fontSize": 40,
+                "fontSize": 32,
                 "richInheritPlainLabel": true,
                 "valueAnimation": false
             },
             "center": [
-                "35%",
-                "35%"
+                "70%",
+                "50%"
             ],
             "xAxisIndex": 1,
             "yAxisIndex": 1
@@ -171,8 +171,8 @@
             "text": "\u82f1\u8bed",
             "target": "blank",
             "subtarget": "blank",
-            "left": "13%",
-            "top": "3%",
+            "left": "20%",
+            "top": "5%",
             "padding": 5,
             "itemGap": 10,
             "textAlign": "auto",
@@ -188,8 +188,8 @@
             "text": "\u6c49\u8bed",
             "target": "blank",
             "subtarget": "blank",
-            "left": "32%",
-            "top": "3%",
+            "left": "65%",
+            "top": "5%",
             "padding": 5,
             "itemGap": 10,
             "textAlign": "auto",
@@ -226,7 +226,10 @@
         }
     ]
 };
-        chart_a7ca46e94ab6494e978c95775e715b3e.setOption(option_a7ca46e94ab6494e978c95775e715b3e);
+        chart_cb08bd9fbad74603b3770456aef92983.setOption(option_cb08bd9fbad74603b3770456aef92983);
+            window.addEventListener('resize', function(){
+                chart_cb08bd9fbad74603b3770456aef92983.resize();
+            })
     </script>
 </body>
 </html>

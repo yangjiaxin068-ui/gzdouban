@@ -8,11 +8,11 @@
     
 </head>
 <body >
-    <div id="72b6f6e466394ab2b553b83114b88b16" class="chart-container" style="width:500px; height:400px; "></div>
+    <div id="78e35fffdd63458bb240474673dddb4b" class="chart-container" style="width:100%; height:100%; "></div>
     <script>
-        var chart_72b6f6e466394ab2b553b83114b88b16 = echarts.init(
-            document.getElementById('72b6f6e466394ab2b553b83114b88b16'), 'white', {renderer: 'canvas', locale: 'ZH'});
-        var option_72b6f6e466394ab2b553b83114b88b16 = {
+        var chart_78e35fffdd63458bb240474673dddb4b = echarts.init(
+            document.getElementById('78e35fffdd63458bb240474673dddb4b'), 'white', {renderer: 'canvas', locale: 'ZH'});
+        var option_78e35fffdd63458bb240474673dddb4b = {
     "animation": true,
     "animationThreshold": 2000,
     "animationDuration": 1000,
@@ -54,23 +54,23 @@
             "data": [
                 {
                     "name": "\u5267\u60c5",
-                    "value": 268
+                    "value": 254
                 },
                 {
                     "name": "\u559c\u5267",
-                    "value": 117
+                    "value": 110
                 },
                 {
                     "name": "\u5947\u5e7b",
-                    "value": 78
+                    "value": 81
                 },
                 {
                     "name": "\u5192\u9669",
-                    "value": 74
+                    "value": 79
                 },
                 {
                     "name": "\u7231\u60c5",
-                    "value": 70
+                    "value": 72
                 }
             ],
             "radius": [
@@ -176,7 +176,10 @@
         }
     ]
 };
-        chart_72b6f6e466394ab2b553b83114b88b16.setOption(option_72b6f6e466394ab2b553b83114b88b16);
+        chart_78e35fffdd63458bb240474673dddb4b.setOption(option_78e35fffdd63458bb240474673dddb4b);
+            window.addEventListener('resize', function(){
+                chart_78e35fffdd63458bb240474673dddb4b.resize();
+            })
     </script>
 </body>
 </html>
