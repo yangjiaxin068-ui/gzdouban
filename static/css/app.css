@@ -1,18 +1,21 @@
 :root {
-    --app-bg: #f5f7fb;
-    --app-surface: #ffffff;
-    --app-surface-soft: #f8fafc;
-    --app-text: #172033;
+    --app-bg: #eef3f8;
+    --app-surface: rgba(255, 255, 255, 0.88);
+    --app-surface-solid: #ffffff;
+    --app-surface-soft: #f4f7fb;
+    --app-text: #101828;
     --app-muted: #667085;
-    --app-border: #e5e7eb;
-    --app-primary: #2563eb;
-    --app-primary-dark: #1d4ed8;
-    --app-accent: #14b8a6;
+    --app-border: rgba(148, 163, 184, 0.28);
+    --app-primary: #3157d5;
+    --app-primary-dark: #2444b8;
+    --app-accent: #0f766e;
+    --app-amber: #b7791f;
     --app-danger: #ef4444;
     --app-warning: #f59e0b;
-    --app-sidebar: #111827;
-    --app-sidebar-soft: #1f2937;
-    --app-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    --app-sidebar: #111318;
+    --app-sidebar-soft: #1e232c;
+    --app-shadow: 0 20px 44px rgba(15, 23, 42, 0.08);
+    --app-shadow-hover: 0 26px 58px rgba(15, 23, 42, 0.13);
     --app-radius: 8px;
 }
 
@@ -21,7 +24,10 @@
 }
 
 body.sb-nav-fixed {
-    background: var(--app-bg);
+    background:
+        linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px) 0 0 / 36px 36px,
+        linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px) 0 0 / 36px 36px,
+        linear-gradient(180deg, #f7f9fc 0%, var(--app-bg) 100%);
     color: var(--app-text);
     font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
 }
@@ -33,10 +39,10 @@ a {
 
 .sb-topnav {
     height: 64px;
-    background: rgba(255, 255, 255, 0.96) !important;
+    background: rgba(255, 255, 255, 0.82) !important;
     border-bottom: 1px solid var(--app-border);
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
-    backdrop-filter: blur(10px);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+    backdrop-filter: blur(16px);
 }
 
 .navbar-brand.app-brand {
@@ -55,7 +61,8 @@ a {
     margin-right: 10px;
     border-radius: 8px;
     color: #fff;
-    background: linear-gradient(135deg, var(--app-primary), var(--app-accent));
+    background: linear-gradient(135deg, #3157d5 0%, #0f766e 100%);
+    box-shadow: 0 10px 24px rgba(49, 87, 213, 0.22);
 }
 
 #sidebarToggle {
@@ -67,7 +74,8 @@ a {
     border: 1px solid var(--app-border);
     border-radius: 999px;
     padding: 8px 12px !important;
-    background: var(--app-surface);
+    background: rgba(255, 255, 255, 0.76);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
 }
 
 #layoutSidenav {
@@ -79,9 +87,11 @@ a {
 }
 
 .sb-sidenav {
-    background: var(--app-sidebar) !important;
+    background:
+        linear-gradient(180deg, rgba(49, 87, 213, 0.16), transparent 28%),
+        linear-gradient(140deg, #111318 0%, #171b22 54%, #101318 100%) !important;
     color: rgba(255, 255, 255, 0.72);
-    box-shadow: 10px 0 30px rgba(15, 23, 42, 0.08);
+    box-shadow: 14px 0 34px rgba(15, 23, 42, 0.16);
 }
 
 .sb-sidenav .sb-sidenav-menu {
@@ -104,18 +114,22 @@ a {
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
-    transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    border: 1px solid transparent;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    will-change: transform;
 }
 
 .sb-sidenav .nav-link:hover {
     color: #fff;
-    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.07);
 }
 
 .sb-sidenav .nav-link.active {
     color: #fff;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(20, 184, 166, 0.9));
-    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+    border-color: rgba(125, 211, 252, 0.28);
+    background: linear-gradient(135deg, rgba(49, 87, 213, 0.94), rgba(15, 118, 110, 0.92));
+    box-shadow: 0 12px 30px rgba(49, 87, 213, 0.28);
 }
 
 .sb-nav-link-icon {
@@ -128,7 +142,7 @@ a {
 #layoutSidenav #layoutSidenav_content {
     margin-left: 248px;
     padding-left: 0 !important;
-    background: var(--app-bg);
+    background: transparent;
 }
 
 .sb-nav-fixed #layoutSidenav #layoutSidenav_content {
@@ -141,7 +155,7 @@ a {
 }
 
 main {
-    padding: 24px;
+    padding: 30px 34px;
 }
 
 .breadcrumb {
@@ -166,12 +180,13 @@ main {
     color: var(--app-primary);
     font-size: 13px;
     font-weight: 700;
+    letter-spacing: 0.02em;
 }
 
 .page-title {
     margin: 0;
     color: var(--app-text);
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 800;
     letter-spacing: 0;
 }
@@ -187,6 +202,18 @@ main {
     border-radius: var(--app-radius);
     box-shadow: var(--app-shadow);
     overflow: hidden;
+    background: var(--app-surface);
+    backdrop-filter: blur(14px);
+    will-change: transform;
+    transition: box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.card:hover,
+.stat-card:hover,
+.movie-result:hover,
+.toolbar-card:hover {
+    border-color: rgba(49, 87, 213, 0.24);
+    box-shadow: var(--app-shadow-hover);
 }
 
 .card-header {
@@ -195,13 +222,13 @@ main {
     align-items: center;
     gap: 8px;
     color: var(--app-text);
-    background: var(--app-surface);
+    background: rgba(255, 255, 255, 0.78);
     border-bottom: 1px solid var(--app-border);
     font-weight: 700;
 }
 
 .card-body {
-    background: var(--app-surface);
+    background: rgba(255, 255, 255, 0.82);
 }
 
 .stat-grid {
@@ -217,20 +244,57 @@ main {
     padding: 18px;
     border: 1px solid var(--app-border);
     border-radius: var(--app-radius);
-    background: var(--app-surface);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.78)),
+        var(--app-surface-solid);
     box-shadow: var(--app-shadow);
     overflow: hidden;
+    will-change: transform;
+}
+
+.stat-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--app-primary), var(--app-accent), var(--app-amber));
 }
 
 .stat-card::after {
     content: "";
     position: absolute;
-    right: -28px;
-    bottom: -32px;
-    width: 96px;
-    height: 96px;
-    border-radius: 50%;
-    background: rgba(37, 99, 235, 0.08);
+    right: 14px;
+    bottom: 14px;
+    width: 58px;
+    height: 38px;
+    background:
+        linear-gradient(90deg, rgba(49, 87, 213, 0.14) 1px, transparent 1px),
+        linear-gradient(rgba(15, 118, 110, 0.11) 1px, transparent 1px);
+    background-size: 10px 10px;
+    opacity: 0.72;
+}
+
+.stat-top {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.stat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(49, 87, 213, 0.18);
+    border-radius: 8px;
+    color: var(--app-primary);
+    background: rgba(49, 87, 213, 0.08);
 }
 
 .stat-label {
@@ -286,6 +350,8 @@ main {
     border-radius: var(--app-radius);
     background: var(--app-surface);
     box-shadow: var(--app-shadow);
+    backdrop-filter: blur(14px);
+    will-change: transform;
 }
 
 .toolbar-label {
@@ -305,6 +371,19 @@ main {
     height: 42px;
 }
 
+.form-control {
+    border-color: rgba(148, 163, 184, 0.45);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.86);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.form-control:focus {
+    border-color: rgba(49, 87, 213, 0.62);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(49, 87, 213, 0.12);
+}
+
 .search-form .btn {
     min-width: 112px;
     white-space: nowrap;
@@ -314,23 +393,26 @@ main {
 .btn-secondary.active {
     background: var(--app-primary);
     border-color: var(--app-primary);
+    box-shadow: 0 12px 24px rgba(49, 87, 213, 0.18);
 }
 
 .btn-primary:hover {
     background: var(--app-primary-dark);
     border-color: var(--app-primary-dark);
+    box-shadow: 0 16px 30px rgba(49, 87, 213, 0.24);
 }
 
 .btn-outline-app {
     color: var(--app-primary);
     border-color: rgba(37, 99, 235, 0.35);
-    background: #fff;
+    background: rgba(255, 255, 255, 0.74);
 }
 
 .btn-outline-app:hover {
     color: #fff;
     background: var(--app-primary);
     border-color: var(--app-primary);
+    box-shadow: 0 12px 24px rgba(49, 87, 213, 0.18);
 }
 
 .type-filter {
@@ -353,6 +435,8 @@ main {
     background: var(--app-surface);
     box-shadow: var(--app-shadow);
     overflow: hidden;
+    backdrop-filter: blur(14px);
+    will-change: transform;
 }
 
 .movie-gallery {
@@ -453,7 +537,7 @@ table.dataTable,
     height: 118px;
     border-radius: 8px;
     object-fit: cover;
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
 }
 
 .wordcloud-stage {
@@ -475,16 +559,20 @@ table.dataTable,
     display: grid;
     place-items: center;
     padding: 24px;
-    background: linear-gradient(135deg, #eef4ff 0%, #f8fafc 48%, #edfdf8 100%);
+    background:
+        linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px) 0 0 / 36px 36px,
+        linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px) 0 0 / 36px 36px,
+        linear-gradient(135deg, #eef4ff 0%, #f8fafc 48%, #edfdf8 100%);
 }
 
 .auth-card {
     width: min(460px, 100%);
     padding: 34px;
     border: 1px solid var(--app-border);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.94);
+    border-radius: var(--app-radius);
+    background: rgba(255, 255, 255, 0.88);
     box-shadow: var(--app-shadow);
+    backdrop-filter: blur(18px);
 }
 
 .auth-title {

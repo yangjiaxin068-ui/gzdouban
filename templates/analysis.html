@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <script src="{{ url_for('static', filename='js/flexible.js') }}"></script>
     <script src="{{ url_for('static', filename='js/echarts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/gsap.min.js') }}"></script>
     <style>
         .chart-slot {
             width: 100%;
@@ -23,7 +24,7 @@
 </head>
 <body>
 <header>
-    <a href="javascript:history.back()" class="return-button">返回</a>
+    <a href="{{ url_for('home') }}" class="return-button">返回</a>
     <h1>豆瓣电影数据可视化</h1>
     <!--顶部时间-->
     <div class="showTime"></div>
@@ -288,5 +289,6 @@
     drawGlobe();
     window.addEventListener('resize', resizeGlobe);
 </script>
+<script src="{{ url_for('static', filename='js/app-motion.js') }}"></script>
 </body>
 </html>
