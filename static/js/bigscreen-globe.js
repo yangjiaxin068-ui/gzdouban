@@ -25,6 +25,20 @@
     var cloudRotationSpeed = THREE.Math.degToRad(6.8);
     var baseTiltX = THREE.Math.degToRad(18);
     var clock = new THREE.Clock();
+    var autoRotationY = 0;
+    var cloudRotationY = 0;
+    var manualRotationY = 0;
+    var manualTiltX = 0;
+    var dragVelocityY = 0;
+    var dragVelocityX = 0;
+    var isDragging = false;
+    var lastPointerX = 0;
+    var lastPointerY = 0;
+    var pointerRotateScale = 0.0065;
+    var pointerTiltScale = 0.0042;
+    var maxTiltOffset = THREE.Math.degToRad(30);
+    var maxDragVelocityY = 0.08;
+    var maxDragVelocityX = 0.045;
 
     var countryCoords = {
         "中国大陆": [104, 35],
@@ -63,6 +77,10 @@
 
     function asset(path) {
         return "/static/images/earth/" + path;
+    }
+
+    function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
     }
 
     function resolveCoord(name) {
@@ -310,6 +328,77 @@
 
     var sceneParts = buildScene();
 
+    function setDragging(active) {
+        isDragging = active;
+        if (stage) {
+            stage.classList.toggle("is-dragging", active);
+        }
+    }
+
+    function beginDrag(event) {
+        if (event.button !== undefined && event.button !== 0) {
+            return;
+        }
+        setDragging(true);
+        lastPointerX = event.clientX;
+        lastPointerY = event.clientY;
+        dragVelocityY = 0;
+        dragVelocityX = 0;
+        if (canvas.setPointerCapture && event.pointerId !== undefined) {
+            canvas.setPointerCapture(event.pointerId);
+        }
+        event.preventDefault();
+    }
+
+    function moveDrag(event) {
+        if (!isDragging) {
+            return;
+        }
+
+        var dx = event.clientX - lastPointerX;
+        var dy = event.clientY - lastPointerY;
+        var rotationDelta = dx * pointerRotateScale;
+        var tiltDelta = dy * pointerTiltScale;
+
+        manualRotationY += rotationDelta;
+        manualTiltX = clamp(manualTiltX + tiltDelta, -maxTiltOffset, maxTiltOffset);
+        dragVelocityY = clamp(rotationDelta, -maxDragVelocityY, maxDragVelocityY);
+        dragVelocityX = clamp(tiltDelta, -maxDragVelocityX, maxDragVelocityX);
+        lastPointerX = event.clientX;
+        lastPointerY = event.clientY;
+        event.preventDefault();
+    }
+
+    function endDrag(event) {
+        if (!isDragging) {
+            return;
+        }
+        setDragging(false);
+        if (reduceMotion) {
+            dragVelocityY = 0;
+            dragVelocityX = 0;
+        }
+        if (canvas.releasePointerCapture && event && event.pointerId !== undefined && canvas.hasPointerCapture(event.pointerId)) {
+            canvas.releasePointerCapture(event.pointerId);
+        }
+    }
+
+    function bindDrag() {
+        canvas.addEventListener("pointerdown", beginDrag);
+        canvas.addEventListener("pointermove", moveDrag);
+        canvas.addEventListener("pointerup", endDrag);
+        canvas.addEventListener("pointercancel", endDrag);
+        canvas.addEventListener("lostpointercapture", endDrag);
+        canvas.addEventListener("dragstart", function (event) {
+            event.preventDefault();
+        });
+        window.addEventListener("blur", function () {
+            setDragging(false);
+            dragVelocityY = 0;
+            dragVelocityX = 0;
+        });
+    }
+
     function resize() {
         var rect = stage.getBoundingClientRect();
         var width = Math.max(1, rect.width);
@@ -335,18 +424,37 @@
     }
 
     function render() {
-        var elapsed = clock.getElapsedTime();
+        var delta = Math.min(clock.getDelta(), 0.05);
+        var elapsed = clock.elapsedTime;
         if (!reduceMotion) {
-            earthGroup.rotation.y = baseRotationY + elapsed * autoRotationSpeed;
-            earthGroup.rotation.x = baseTiltX + Math.sin(elapsed * 0.34) * THREE.Math.degToRad(1.4);
-            sceneParts.clouds.rotation.y = textureRotationY + elapsed * cloudRotationSpeed;
+            autoRotationY += autoRotationSpeed * delta;
+            cloudRotationY += cloudRotationSpeed * delta;
         }
+
+        if (!isDragging && !reduceMotion && (Math.abs(dragVelocityY) > 0.0001 || Math.abs(dragVelocityX) > 0.0001)) {
+            manualRotationY += dragVelocityY;
+            manualTiltX = clamp(manualTiltX + dragVelocityX, -maxTiltOffset, maxTiltOffset);
+            var damping = Math.pow(0.08, delta);
+            dragVelocityY *= damping;
+            dragVelocityX *= damping;
+            if (Math.abs(dragVelocityY) <= 0.0001) {
+                dragVelocityY = 0;
+            }
+            if (Math.abs(dragVelocityX) <= 0.0001) {
+                dragVelocityX = 0;
+            }
+        }
+
+        earthGroup.rotation.y = baseRotationY + autoRotationY + manualRotationY;
+        earthGroup.rotation.x = baseTiltX + manualTiltX + (reduceMotion ? 0 : Math.sin(elapsed * 0.34) * THREE.Math.degToRad(1.4));
+        sceneParts.clouds.rotation.y = textureRotationY + cloudRotationY;
         updateMarkerVisibility();
         renderer.render(scene, camera);
         requestAnimationFrame(render);
     }
 
     resize();
+    bindDrag();
     window.addEventListener("resize", resize);
     render();
 })();
