@@ -1,35 +1,38 @@
 {% extends "base.html" %}
-{% block title %}演员导演{% endblock %}
+{% block title %}演员导演 - 电影数据分析系统{% endblock %}
 {% block content %}
 <div class="app-page">
-    <div class="page-head">
+    <section class="page-head">
         <div>
-            <div class="page-kicker">People</div>
+            <span class="eyebrow">People</span>
             <h1 class="page-title">演员与导演分析</h1>
             <p class="page-subtitle">统计出现频率较高的导演和演员，观察数据中的核心创作者。</p>
         </div>
-    </div>
+    </section>
 
-    <div class="chart-grid">
-        <div class="card">
-            <div class="card-header">
+    <section class="chart-grid">
+        <article class="panel-card">
+            <div class="panel-title">
+                <div>
+                    <span class="eyebrow">Director</span>
+                    <h2>导演作品数量 Top 20</h2>
+                </div>
                 <i class="fas fa-video"></i>
-                导演作品数量 Top 20
             </div>
-            <div class="card-body">
-                <div id="directorChart" class="chart-box chart-tall"></div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
+            <div id="directorChart" class="chart-box chart-tall"></div>
+        </article>
+
+        <article class="panel-card">
+            <div class="panel-title">
+                <div>
+                    <span class="eyebrow">Actor</span>
+                    <h2>演员参演数量 Top 20</h2>
+                </div>
                 <i class="fas fa-users"></i>
-                演员参演数量 Top 20
             </div>
-            <div class="card-body">
-                <div id="actorChart" class="chart-box chart-tall"></div>
-            </div>
-        </div>
-    </div>
+            <div id="actorChart" class="chart-box chart-tall"></div>
+        </article>
+    </section>
 </div>
 {% endblock %}
 
@@ -38,35 +41,42 @@
   const directorChart = echarts.init(document.getElementById('directorChart'));
   const actorChart = echarts.init(document.getElementById('actorChart'));
 
-  const peopleBarOption = function (names, values, color, seriesName) {
+  function peopleBarOption(names, values, colors, seriesName) {
     return {
-      color: [color],
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      grid: { left: 118, right: 28, top: 32, bottom: 34 },
+      color: colors,
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, borderWidth: 0, backgroundColor: 'rgba(20, 24, 33, 0.92)', textStyle: { color: '#fff' } },
+      grid: { left: 126, right: 28, top: 32, bottom: 34 },
       xAxis: {
         type: 'value',
         name: '数量',
-        splitLine: { lineStyle: { color: '#eef2f7' } },
-        axisLabel: { color: '#667085' }
+        splitLine: { lineStyle: { color: '#edf2f7' } },
+        axisLabel: { color: '#64748b' }
       },
       yAxis: {
         type: 'category',
         data: names,
-        axisLabel: { color: '#344054' },
-        axisLine: { lineStyle: { color: '#d0d5dd' } }
+        inverse: true,
+        axisLabel: { color: '#334155' },
+        axisLine: { lineStyle: { color: '#d8dee9' } }
       },
       series: [{
         name: seriesName,
         type: 'bar',
         data: values,
         barWidth: 14,
-        itemStyle: { borderRadius: [0, 8, 8, 0] }
+        itemStyle: {
+          borderRadius: [0, 8, 8, 0],
+          color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+            { offset: 0, color: colors[0] },
+            { offset: 1, color: colors[1] || colors[0] }
+          ])
+        }
       }]
     };
-  };
+  }
 
-  directorChart.setOption(peopleBarOption({{ x | tojson }}, {{ y | tojson }}, '#2563eb', '导演作品数量'));
-  actorChart.setOption(peopleBarOption({{ x1 | tojson }}, {{ y1 | tojson }}, '#14b8a6', '演员参演数量'));
+  directorChart.setOption(peopleBarOption({{ x | tojson }}, {{ y | tojson }}, ['#2f6fed', '#1aa99a'], '导演作品数量'));
+  actorChart.setOption(peopleBarOption({{ x1 | tojson }}, {{ y1 | tojson }}, ['#f5a524', '#e25563'], '演员参演数量'));
 
   window.addEventListener('resize', function () {
     directorChart.resize();

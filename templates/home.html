@@ -1,93 +1,122 @@
 {% extends "base.html" %}
-{% block title %}首页{% endblock %}
+{% block title %}首页概览 - 电影数据分析系统{% endblock %}
 {% block content %}
-<div class="app-page">
-    <div class="page-head">
+<div class="app-page dashboard-page">
+    <section class="workbench-hero">
         <div>
-            <div class="page-kicker">Dashboard</div>
-            <h1 class="page-title">电影数据总览</h1>
-            <p class="page-subtitle">当前数据库中的电影规模、评分概况和类型分布。</p>
+            <span class="eyebrow">Dashboard</span>
+            <h1>电影数据工作台</h1>
+            <p>集中查看电影规模、评分、类型、语言和核心人物，快速进入后续分析页面。</p>
         </div>
-    </div>
+        <div class="hero-actions">
+            <a class="btn btn-primary" href="{{ url_for('analysis1') }}">
+                <i class="fas fa-desktop"></i>
+                可视化大屏
+            </a>
+            <a class="btn btn-outline-app" href="{{ url_for('tables', id=0) }}">
+                <i class="fas fa-table"></i>
+                查看数据表
+            </a>
+        </div>
+    </section>
 
-    <div class="stat-grid">
-        <div class="stat-card">
-            <div class="stat-label">电影总数</div>
-            <div class="stat-value">{{ dataLen }}</div>
-            <div class="stat-hint">条电影记录</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">最高评分</div>
-            <div class="stat-value">{{ maxRate }}</div>
-            <div class="stat-hint">豆瓣评分</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">高频演员</div>
-            <div class="stat-value">{{ maxCast }}</div>
-            <div class="stat-hint">出现次数最多</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">主要地区</div>
-            <div class="stat-value">中国大陆</div>
-            <div class="stat-hint">制片地区最多</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">类型数量</div>
-            <div class="stat-value">{{ typeAll }}</div>
-            <div class="stat-hint">电影类型</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">主要语言</div>
-            <div class="stat-value">{{ maxLang }}</div>
-            <div class="stat-hint">出现次数最多</div>
-        </div>
-    </div>
+    <section class="stat-grid">
+        <article class="stat-card accent-blue">
+            <div class="stat-top">
+                <span class="stat-label">电影总数</span>
+                <span class="stat-icon"><i class="fas fa-film"></i></span>
+            </div>
+            <strong class="stat-value">{{ dataLen }}</strong>
+            <span class="stat-hint">数据库记录数</span>
+        </article>
+        <article class="stat-card accent-gold">
+            <div class="stat-top">
+                <span class="stat-label">最高评分</span>
+                <span class="stat-icon"><i class="fas fa-star"></i></span>
+            </div>
+            <strong class="stat-value">{{ maxRate }}</strong>
+            <span class="stat-hint">豆瓣评分峰值</span>
+        </article>
+        <article class="stat-card accent-rose">
+            <div class="stat-top">
+                <span class="stat-label">高频演员</span>
+                <span class="stat-icon"><i class="fas fa-user-friends"></i></span>
+            </div>
+            <strong class="stat-value stat-text">{{ maxCast }}</strong>
+            <span class="stat-hint">出现次数最高</span>
+        </article>
+        <article class="stat-card accent-green">
+            <div class="stat-top">
+                <span class="stat-label">类型数量</span>
+                <span class="stat-icon"><i class="fas fa-layer-group"></i></span>
+            </div>
+            <strong class="stat-value">{{ typeAll }}</strong>
+            <span class="stat-hint">已识别题材</span>
+        </article>
+        <article class="stat-card accent-cyan">
+            <div class="stat-top">
+                <span class="stat-label">主要语言</span>
+                <span class="stat-icon"><i class="fas fa-language"></i></span>
+            </div>
+            <strong class="stat-value stat-text">{{ maxLang }}</strong>
+            <span class="stat-hint">出现频率最高</span>
+        </article>
+        <article class="stat-card accent-slate">
+            <div class="stat-top">
+                <span class="stat-label">推荐入口</span>
+                <span class="stat-icon"><i class="fas fa-search"></i></span>
+            </div>
+            <strong class="stat-value stat-text">电影检索</strong>
+            <span class="stat-hint">按片名查看详情</span>
+        </article>
+    </section>
 
-    <div class="chart-grid">
-        <div class="card">
-            <div class="card-header">
+    <section class="chart-grid">
+        <article class="panel-card">
+            <div class="panel-title">
+                <div>
+                    <span class="eyebrow">Genre</span>
+                    <h2>电影类型分布</h2>
+                </div>
                 <i class="fas fa-chart-pie"></i>
-                电影类型分布
             </div>
-            <div class="card-body">
-                <div id="mainOne" class="chart-box"></div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
+            <div id="mainOne" class="chart-box"></div>
+        </article>
+
+        <article class="panel-card">
+            <div class="panel-title">
+                <div>
+                    <span class="eyebrow">Rating</span>
+                    <h2>评分分布趋势</h2>
+                </div>
                 <i class="fas fa-chart-line"></i>
-                评分分布趋势
             </div>
-            <div class="card-body">
-                <div id="mainTwo" class="chart-box"></div>
-            </div>
-        </div>
-    </div>
+            <div id="mainTwo" class="chart-box"></div>
+        </article>
+    </section>
 </div>
 {% endblock %}
 
 {% block scriptcontent %}
 <script>
+  const appPalette = ['#2f6fed', '#1aa99a', '#f5a524', '#e25563', '#7c3aed', '#0891b2', '#5d7c2f'];
+
   const typeChart = echarts.init(document.getElementById('mainOne'));
   const homeTypeData = {{ types | tojson }};
   typeChart.setOption({
-    color: ['#2563eb', '#14b8a6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16'],
-    tooltip: { trigger: 'item' },
-    legend: { type: 'scroll', bottom: 0, left: 'center' },
+    color: appPalette,
+    tooltip: { trigger: 'item', borderWidth: 0, backgroundColor: 'rgba(20, 24, 33, 0.92)', textStyle: { color: '#fff' } },
+    legend: { type: 'scroll', bottom: 6, left: 'center', textStyle: { color: '#64748b' } },
     series: [{
       name: '类型数量',
       type: 'pie',
-      radius: ['42%', '68%'],
+      radius: ['46%', '70%'],
       center: ['50%', '45%'],
       data: homeTypeData,
       label: { show: false },
       emphasis: {
-        label: {
-          show: true,
-          formatter: '{b}: {c}',
-          fontSize: 16,
-          fontWeight: 700
-        }
+        scaleSize: 8,
+        label: { show: true, formatter: '{b}: {c}', fontSize: 16, fontWeight: 700, color: '#111827' }
       },
       itemStyle: { borderColor: '#fff', borderWidth: 3 }
     }]
@@ -95,23 +124,36 @@
 
   const rateChart = echarts.init(document.getElementById('mainTwo'));
   rateChart.setOption({
-    color: ['#2563eb'],
-    tooltip: { trigger: 'axis' },
-    grid: { left: 45, right: 24, top: 36, bottom: 46 },
+    color: ['#2f6fed'],
+    tooltip: { trigger: 'axis', borderWidth: 0, backgroundColor: 'rgba(20, 24, 33, 0.92)', textStyle: { color: '#fff' } },
+    grid: { left: 52, right: 24, top: 32, bottom: 48 },
     xAxis: {
       type: 'category',
       data: {{ x | tojson }},
       boundaryGap: false,
-      name: '分数'
+      name: '分数',
+      axisLabel: { color: '#64748b' },
+      axisLine: { lineStyle: { color: '#d8dee9' } }
     },
-    yAxis: { type: 'value', name: '数量' },
+    yAxis: {
+      type: 'value',
+      name: '数量',
+      splitLine: { lineStyle: { color: '#edf2f7' } },
+      axisLabel: { color: '#64748b' }
+    },
     series: [{
       name: '数量',
       type: 'line',
       smooth: true,
       data: {{ y | tojson }},
-      areaStyle: { color: 'rgba(37, 99, 235, 0.12)' },
-      lineStyle: { width: 3 }
+      areaStyle: {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: 'rgba(47, 111, 237, 0.24)' },
+          { offset: 1, color: 'rgba(47, 111, 237, 0.02)' }
+        ])
+      },
+      lineStyle: { width: 4 },
+      symbolSize: 7
     }]
   });
 
