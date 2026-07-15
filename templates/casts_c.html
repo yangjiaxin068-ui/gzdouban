@@ -1,22 +1,25 @@
 {% extends "base.html" %}
-{% block title %}演员词云{% endblock %}
+{% block title %}演员词云 - 电影数据分析系统{% endblock %}
 {% block content %}
 <div class="app-page">
-    <div class="page-head">
+    <section class="page-head">
         <div>
-            <div class="page-kicker">Word Cloud</div>
+            <span class="eyebrow">Word Cloud</span>
             <h1 class="page-title">演员词云</h1>
-            <p class="page-subtitle">根据演员字段实时生成词云图。</p>
+            <p class="page-subtitle">根据演员字段实时生成词云图，观察数据集中出现频率较高的演员。</p>
         </div>
-    </div>
-    <div class="card">
-        <div class="card-header">
+    </section>
+    <section class="panel-card">
+        <div class="panel-title">
+            <div>
+                <span class="eyebrow">Casts</span>
+                <h2>演员关键词</h2>
+            </div>
             <i class="fas fa-user-friends"></i>
-            演员关键词
         </div>
-        <div class="card-body wordcloud-stage">
-            <img src="/static/images/casts.png" alt="演员词云">
+        <div class="wordcloud-stage">
+            <img src="{{ url_for('static', filename='images/casts.png') }}" alt="演员词云">
         </div>
-    </div>
+    </section>
 </div>
 {% endblock %}

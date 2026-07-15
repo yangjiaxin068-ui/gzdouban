@@ -123,7 +123,7 @@ def register():
             return redirect(url_for("register"))
 
         if password != password_checked:
-            return "<h1>两次密码不一致！！</h1>"
+            return "<h1>两次密码不一致！</h1>"
 
         conn, cursor = get_conn()
         try:
@@ -131,7 +131,7 @@ def register():
             user = cursor.fetchone()
 
             if user:
-                return "<h1>用户名已存在！！</h1>"
+                return "<h1>用户名已存在！</h1>"
 
             cursor.execute(
                 "INSERT INTO dbo.users (username, password) VALUES (?, ?)",
@@ -215,7 +215,7 @@ def home():
     )
 
 
-@app.route("/analysis1", methods=["GET", "POST"])
+@app.route("/analysis1", methods=["GET", "POST"], endpoint="analysis1")
 @login_required
 def index():
     allData = getAllData()
@@ -223,7 +223,7 @@ def index():
     maxRate = getMaxRate()
     typeAll = getTypesAll()
     typeAll = len(typeAll)
-    maxLang = getMaxLang()[:2]
+    maxLang = getMaxLang()
     country_x, country_y = getAddressData()
     country_pairs = sorted(
         zip(country_x, country_y),

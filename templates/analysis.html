@@ -1,292 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>豆瓣电影数据可视化</title>
+    <title>电影数据可视化大屏</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-    <script src="{{ url_for('static', filename='js/flexible.js') }}"></script>
     <script src="{{ url_for('static', filename='js/echarts.js') }}"></script>
-    <style>
-        .chart-slot {
-            width: 100%;
-            height: calc(100% - 0.65rem);
-            overflow: hidden;
-        }
-
-        .chart-slot .chart-container {
-            width: 100% !important;
-            height: 100% !important;
-        }
-    </style>
+    <script src="{{ url_for('static', filename='js/gsap.min.js') }}"></script>
 </head>
-<body>
-<header>
-    <a href="javascript:history.back()" class="return-button">返回</a>
-    <h1>豆瓣电影数据可视化</h1>
-    <!--顶部时间-->
-    <div class="showTime"></div>
-    <script>
-        var t = null;
-        t = setTimeout(time, 1000);
-        function time() {
-            clearInterval(t); //清除定时器
-            dt = new Date();  //获取当前时间
-            var y = dt.getFullYear();
-            var mt = dt.getMonth() + 1;
-            var day = dt.getDate();
-            var h = dt.getHours();
-            var m = dt.getMinutes();
-            var s = dt.getSeconds();
-            document.querySelector(".showTime").innerHTML = '当前时间：' + y + '年' + mt + '月' + day + '日' + '-' + h + '时' + m + '分' + s + '秒';
-            t = setTimeout(time, 1000); // 设定定时器，循环运行
-        }
-    </script>
-</header>
-<!--中间信息-->
-<section class="mainbox">
-    <div class="column">
-        <div class="panel">
-            <h2>电影类型TOP5</h2>
-            <div class="chart-slot">{{ chart_html1 | safe }}</div>
-        </div>
-        <div class="panel">
-            <h2>中英文电影占比</h2>
-            <div class="chart-slot">{{ chart_html3 | safe }}</div>
-        </div>
+<body class="screen-body">
+<header class="screen-header">
+    <a href="{{ url_for('home') }}" class="return-button" title="返回首页">
+        <i class="fas fa-arrow-left"></i>
+        返回首页
+    </a>
+    <div class="screen-title">
+        <span>Movie Intelligence Center</span>
+        <h1>豆瓣电影数据可视化大屏</h1>
     </div>
-    <div class="column">
-        <div class="no">
-            <div class="no-hd">
-                <!-- 在这里实现具体的数量-->
-                <ul>
-                    <li>{{ data.allData }}</li>
-                    <li>{{ data.maxRate }}</li>
-                    <li>{{ data.typeAll }}</li>
-                    <li>{{ data.maxLang }}</li>
-                </ul>
+    <div class="showTime" aria-label="当前时间"></div>
+</header>
+
+<main class="screen-grid">
+    <section class="screen-column">
+        <article class="screen-card">
+            <div class="screen-card-head">
+                <span>Genre Structure</span>
+                <h2>电影类型 Top 5</h2>
             </div>
-            <div class="no-bd">
-                <!-- 显示标签-->
-                <ul>
-                    <li>电影个数</li>
-                    <li>最高分数</li>
-                    <li>电影种类数</li>
-                    <li>最大语言数</li>
-                </ul>
+            <div class="chart-slot">{{ chart_html1 | safe }}</div>
+        </article>
+        <article class="screen-card">
+            <div class="screen-card-head">
+                <span>Language Ratio</span>
+                <h2>语言占比</h2>
             </div>
-        </div>
-        <div class="map">
-            <div class="map-title">制片地区分布</div>
-            <div class="globe-wrap">
-                <canvas id="globeCanvas" aria-label="制片地区地球"></canvas>
+            <div class="chart-slot">{{ chart_html3 | safe }}</div>
+        </article>
+    </section>
+
+    <section class="screen-center">
+        <section class="metric-console">
+            <article>
+                <span>电影总数</span>
+                <strong>{{ data.allData }}</strong>
+            </article>
+            <article>
+                <span>最高评分</span>
+                <strong>{{ data.maxRate }}</strong>
+            </article>
+            <article>
+                <span>类型数量</span>
+                <strong>{{ data.typeAll }}</strong>
+            </article>
+            <article>
+                <span>主要语言</span>
+                <strong>{{ data.maxLang }}</strong>
+            </article>
+        </section>
+
+        <section class="globe-panel" aria-label="制片地区地球可视化">
+            <div class="globe-title">
+                <span>Global Distribution</span>
+                <h2>制片地区分布</h2>
+            </div>
+            <div class="globe-stage">
+                <canvas id="globeCanvas"></canvas>
+                <div class="globe-hud globe-hud-left">
+                    <span>Live Scan</span>
+                    <strong>Data Flow</strong>
+                </div>
+                <div class="globe-hud globe-hud-right">
+                    <span>Geo Nodes</span>
+                    <strong>{{ country_data|length }}</strong>
+                </div>
                 <ul class="globe-rank">
-                    {% for item in country_data[:5] %}
+                    {% for item in country_data[:6] %}
                     <li>
-                        <span>{{ item.name }}</span>
+                        <span>{{ loop.index }}. {{ item.name }}</span>
                         <strong>{{ item.value }}</strong>
                     </li>
                     {% endfor %}
                 </ul>
             </div>
-        </div>
-    </div>
-    <div class="column">
-        <div class="panel">
-            <h2>年份电影数据量</h2>
-            <div class="chart-slot">{{ chart_html2 | safe }}</div>
-        </div>
-        <div class="panel">
-            <h2>电影评论数折线图</h2>
-            <div class="chart-slot">{{ chart_html4 | safe }}</div>
-        </div>
-    </div>
-</section>
-<!--底部信息-->
-<section>
-    <div class="column">
-        <div class="no">
-            <div class="no-bd">
-                <ul>
-                    <li>数据采集</li>
-                    <li>数据清洗</li>
-                    <li>可视化分析</li>
-                    <li>词云输出</li>
-                </ul>
+        </section>
+
+        <section class="process-strip">
+            <article><i></i><span>采集</span></article>
+            <article><i></i><span>清洗</span></article>
+            <article><i></i><span>分析</span></article>
+            <article><i></i><span>展示</span></article>
+        </section>
+    </section>
+
+    <section class="screen-column">
+        <article class="screen-card">
+            <div class="screen-card-head">
+                <span>Year Trend</span>
+                <h2>年份电影数量</h2>
             </div>
-        </div>
-    </div>
-</section>
-<section>
- <!--底部信息-->
-</section>
+            <div class="chart-slot">{{ chart_html2 | safe }}</div>
+        </article>
+        <article class="screen-card">
+            <div class="screen-card-head">
+                <span>Comment Trend</span>
+                <h2>电影评论走势</h2>
+            </div>
+            <div class="chart-slot">{{ chart_html4 | safe }}</div>
+        </article>
+    </section>
+</main>
+
 <script>
-    const countryData = {{ country_data | tojson }};
-    const countryCoords = {
-        '中国大陆': [104, 35],
-        '中国香港': [114, 22],
-        '中国台湾': [121, 24],
-        '美国': [-98, 39],
-        '英国': [-3, 55],
-        '日本': [138, 36],
-        '韩国': [128, 36],
-        '法国': [2, 46],
-        '加拿大': [-106, 56],
-        '德国': [10, 51],
-        '澳大利亚': [134, -25],
-        '印度': [78, 22],
-        '意大利': [12, 43],
-        '西班牙': [-4, 40],
-        '泰国': [101, 15],
-        '俄罗斯': [100, 60]
-    };
+    window.__COUNTRY_DATA__ = {{ country_data | tojson }};
 
-    const globeCanvas = document.getElementById('globeCanvas');
-    const globeCtx = globeCanvas.getContext('2d');
-    let globeRotation = 0;
-    let globeDpr = window.devicePixelRatio || 1;
-
-    function resizeGlobe() {
-        const box = globeCanvas.getBoundingClientRect();
-        globeDpr = window.devicePixelRatio || 1;
-        globeCanvas.width = Math.max(1, Math.floor(box.width * globeDpr));
-        globeCanvas.height = Math.max(1, Math.floor(box.height * globeDpr));
+    function updateScreenTime() {
+        const dt = new Date();
+        const pad = value => String(value).padStart(2, '0');
+        document.querySelector('.showTime').textContent =
+            `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}:${pad(dt.getSeconds())}`;
     }
-
-    function projectPoint(lon, lat, radius, centerX, centerY) {
-        const rad = Math.PI / 180;
-        const lambda = (lon + globeRotation) * rad;
-        const phi = lat * rad;
-        const x = radius * Math.cos(phi) * Math.sin(lambda);
-        const y = -radius * Math.sin(phi);
-        const z = radius * Math.cos(phi) * Math.cos(lambda);
-        return {
-            x: centerX + x,
-            y: centerY + y,
-            visible: z > -radius * 0.05,
-            depth: z / radius
-        };
-    }
-
-    function drawProjectedLine(points, radius, centerX, centerY) {
-        globeCtx.beginPath();
-        let drawing = false;
-        points.forEach(([lon, lat]) => {
-            const point = projectPoint(lon, lat, radius, centerX, centerY);
-            if (!point.visible) {
-                drawing = false;
-                return;
-            }
-            if (!drawing) {
-                globeCtx.moveTo(point.x, point.y);
-                drawing = true;
-            } else {
-                globeCtx.lineTo(point.x, point.y);
-            }
-        });
-        globeCtx.stroke();
-    }
-
-    function drawGlobe() {
-        const width = globeCanvas.width;
-        const height = globeCanvas.height;
-        const centerX = width * 0.48;
-        const centerY = height * 0.52;
-        const radius = Math.min(width, height) * 0.36;
-
-        globeCtx.clearRect(0, 0, width, height);
-        globeCtx.save();
-        globeCtx.scale(globeDpr, globeDpr);
-        globeCtx.restore();
-
-        const gradient = globeCtx.createRadialGradient(
-            centerX - radius * 0.28,
-            centerY - radius * 0.35,
-            radius * 0.1,
-            centerX,
-            centerY,
-            radius
-        );
-        gradient.addColorStop(0, 'rgba(125, 249, 255, 0.95)');
-        gradient.addColorStop(0.48, 'rgba(17, 130, 255, 0.7)');
-        gradient.addColorStop(1, 'rgba(0, 24, 90, 0.95)');
-
-        globeCtx.beginPath();
-        globeCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        globeCtx.fillStyle = gradient;
-        globeCtx.fill();
-
-        globeCtx.save();
-        globeCtx.beginPath();
-        globeCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        globeCtx.clip();
-
-        globeCtx.strokeStyle = 'rgba(173, 244, 255, 0.34)';
-        globeCtx.lineWidth = 1.2 * globeDpr;
-        for (let lat = -60; lat <= 60; lat += 30) {
-            const line = [];
-            for (let lon = -180; lon <= 180; lon += 4) {
-                line.push([lon, lat]);
-            }
-            drawProjectedLine(line, radius, centerX, centerY);
-        }
-
-        for (let lon = -150; lon <= 180; lon += 30) {
-            const line = [];
-            for (let lat = -80; lat <= 80; lat += 4) {
-                line.push([lon, lat]);
-            }
-            drawProjectedLine(line, radius, centerX, centerY);
-        }
-
-        countryData.forEach((item, index) => {
-            const coord = countryCoords[item.name];
-            if (!coord) {
-                return;
-            }
-            const point = projectPoint(coord[0], coord[1], radius, centerX, centerY);
-            if (!point.visible) {
-                return;
-            }
-            const pulse = 1 + Math.sin(Date.now() / 360 + index) * 0.22;
-            const dotRadius = (4 + Math.min(item.value, 120) / 42) * pulse * globeDpr;
-            globeCtx.beginPath();
-            globeCtx.arc(point.x, point.y, dotRadius * 2.1, 0, Math.PI * 2);
-            globeCtx.fillStyle = 'rgba(34, 211, 238, 0.16)';
-            globeCtx.fill();
-            globeCtx.beginPath();
-            globeCtx.arc(point.x, point.y, dotRadius, 0, Math.PI * 2);
-            globeCtx.fillStyle = '#7df9ff';
-            globeCtx.fill();
-
-            if (index < 4) {
-                globeCtx.font = `${12 * globeDpr}px Microsoft YaHei, sans-serif`;
-                globeCtx.fillStyle = '#dffaff';
-                globeCtx.fillText(`${item.name} ${item.value}`, point.x + 8 * globeDpr, point.y - 8 * globeDpr);
-            }
-        });
-        globeCtx.restore();
-
-        globeCtx.beginPath();
-        globeCtx.arc(centerX, centerY, radius + 1 * globeDpr, 0, Math.PI * 2);
-        globeCtx.strokeStyle = 'rgba(125, 249, 255, 0.75)';
-        globeCtx.lineWidth = 2 * globeDpr;
-        globeCtx.stroke();
-
-        globeCtx.beginPath();
-        globeCtx.ellipse(centerX, centerY, radius * 1.1, radius * 0.28, -0.12, 0, Math.PI * 2);
-        globeCtx.strokeStyle = 'rgba(125, 249, 255, 0.22)';
-        globeCtx.lineWidth = 1.5 * globeDpr;
-        globeCtx.stroke();
-
-        globeRotation = (globeRotation + 0.22) % 360;
-        requestAnimationFrame(drawGlobe);
-    }
-
-    resizeGlobe();
-    drawGlobe();
-    window.addEventListener('resize', resizeGlobe);
+    updateScreenTime();
+    setInterval(updateScreenTime, 1000);
 </script>
+<script src="{{ url_for('static', filename='js/all.js') }}"></script>
+<script src="{{ url_for('static', filename='js/three.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bigscreen-globe.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app-motion.js') }}"></script>
 </body>
 </html>

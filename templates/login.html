@@ -3,31 +3,52 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>登录 - 电影数据采集分析系统</title>
-    <link href="/static/css/styles.css" rel="stylesheet"/>
-    <link href="/static/css/app.css" rel="stylesheet"/>
+    <title>登录 - 电影数据分析系统</title>
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet"/>
 </head>
 <body class="auth-body">
-<div class="auth-card">
-    <span class="brand-mark"><i class="fas fa-film"></i></span>
-    <h1 class="auth-title">电影数据采集分析系统</h1>
-    <p class="auth-subtitle">登录后查看电影数据、分析图表和词云结果。</p>
+<main class="auth-shell">
+    <section class="auth-visual" aria-hidden="true">
+        <div class="auth-visual-panel">
+            <span class="brand-mark"><i class="fas fa-film"></i></span>
+            <h1>GZ Douban</h1>
+            <p>从电影数据采集到评分、类型、地区和词云分析，一站式完成课程展示。</p>
+            <div class="auth-metric-row">
+                <span>采集</span>
+                <span>清洗</span>
+                <span>分析</span>
+                <span>展示</span>
+            </div>
+        </div>
+    </section>
 
-    <form action="/login" method="POST">
-        <div class="mb-3">
-            <label class="form-label" for="inputUsername">用户名</label>
+    <section class="auth-card">
+        <div class="auth-card-head">
+            <span class="eyebrow">Welcome back</span>
+            <h2>登录系统</h2>
+            <p>输入账号密码进入电影数据工作台。</p>
+        </div>
+
+        <form action="{{ url_for('login') }}" method="POST" class="auth-form">
+            <label class="field-label" for="inputUsername">用户名</label>
             <input class="form-control" id="inputUsername" name="username" type="text" autocomplete="username">
-        </div>
-        <div class="mb-3">
-            <label class="form-label" for="inputPassword">密码</label>
+
+            <label class="field-label" for="inputPassword">密码</label>
             <input class="form-control" id="inputPassword" name="password" type="password" autocomplete="current-password">
-        </div>
-        <div class="auth-actions">
-            <a class="text-muted" href="/register">注册账号</a>
-            <button class="btn btn-primary px-4" type="submit">登录</button>
-        </div>
-    </form>
-</div>
-<script src="/static/js/all.js"></script>
+
+            <div class="auth-actions">
+                <a class="muted-link" href="{{ url_for('register') }}">注册账号</a>
+                <button class="btn btn-primary px-4" type="submit">
+                    <i class="fas fa-arrow-right"></i>
+                    登录
+                </button>
+            </div>
+        </form>
+    </section>
+</main>
+<script src="{{ url_for('static', filename='js/all.js') }}"></script>
+<script src="{{ url_for('static', filename='js/gsap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app-motion.js') }}"></script>
 </body>
 </html>

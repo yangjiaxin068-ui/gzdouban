@@ -10,6 +10,10 @@ from pyecharts.charts import Bar, Line, Pie
 BASE_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = BASE_DIR / "tools" / "data"
 HTML_DIR = BASE_DIR / "static" / "html"
+SCREEN_TEXT = "#dffaff"
+SCREEN_MUTED = "#93d9ea"
+SCREEN_GRID = "rgba(190, 244, 255, 0.18)"
+SCREEN_COLORS = ["#22d3ee", "#60a5fa", "#34d399", "#fbbf24", "#f87171", "#a78bfa"]
 
 
 def _clean_label(value):
@@ -75,25 +79,29 @@ def _render_chart(chart, filename):
 
 def type_chart():
     names, counts = _read_count_csv("type_counts.csv")
+    pairs = list(zip(names, counts))[:8]
     pie = Pie(init_opts=opts.InitOpts(height="100%", width="100%"))
     pie.add(
         "数量",
-        list(zip(names, counts)),
-        radius=["30%", "60%"],
-        label_opts=opts.LabelOpts(
-            formatter="{b}:{c}个",
-            font_size=15,
-            font_style="bold",
-            color="#0f0",
-        ),
+        pairs,
+        radius=["36%", "66%"],
+        center=["50%", "52%"],
+        label_opts=opts.LabelOpts(formatter="{b}: {c}", font_size=14, color=SCREEN_TEXT),
     )
     pie.set_global_opts(
         title_opts=opts.TitleOpts(title=""),
-        tooltip_opts=opts.TooltipOpts(axis_pointer_type="shadow"),
+        tooltip_opts=opts.TooltipOpts(trigger="item", formatter="{b}: {c}部 ({d}%)"),
         legend_opts=opts.LegendOpts(
-            textstyle_opts=opts.TextStyleOpts(font_size=16, color="#0f0")
+            type_="scroll",
+            pos_bottom="0",
+            pos_left="center",
+            textstyle_opts=opts.TextStyleOpts(font_size=13, color=SCREEN_TEXT),
         ),
     )
+    pie.set_series_opts(
+        itemstyle_opts=opts.ItemStyleOpts(border_color="#071d5f", border_width=2)
+    )
+    pie.set_colors(SCREEN_COLORS)
     return _render_chart(pie, "type_data.html")
 
 
@@ -101,32 +109,34 @@ def year_chart():
     years, counts = _read_count_csv("year_counts.csv")
     bar = Bar(init_opts=opts.InitOpts(height="100%", width="100%"))
     bar.add_xaxis(years)
-    bar.add_yaxis("数量", counts)
+    bar.add_yaxis("数量", counts, category_gap="42%")
     bar.set_global_opts(
         title_opts=opts.TitleOpts(title=""),
         xaxis_opts=opts.AxisOpts(
             name="年份",
-            name_textstyle_opts=opts.TextStyleOpts(color="#0f0"),
-            axislabel_opts=opts.LabelOpts(color="#0f0", font_size=12),
-            name_location="middle",
-            name_gap=25,
+            name_textstyle_opts=opts.TextStyleOpts(color=SCREEN_MUTED),
+            axislabel_opts=opts.LabelOpts(color=SCREEN_MUTED, font_size=11),
+            axisline_opts=opts.AxisLineOpts(linestyle_opts=opts.LineStyleOpts(color=SCREEN_GRID)),
         ),
         yaxis_opts=opts.AxisOpts(
             name="数量",
-            name_textstyle_opts=opts.TextStyleOpts(color="#0f0"),
-            axislabel_opts=opts.LabelOpts(color="#0f0", font_size=12),
-            name_location="middle",
-            name_gap=25,
+            name_textstyle_opts=opts.TextStyleOpts(color=SCREEN_MUTED),
+            axislabel_opts=opts.LabelOpts(color=SCREEN_MUTED, font_size=11),
+            splitline_opts=opts.SplitLineOpts(
+                is_show=True,
+                linestyle_opts=opts.LineStyleOpts(color=SCREEN_GRID),
+            ),
         ),
         legend_opts=opts.LegendOpts(
+            pos_top="0",
             pos_left="center",
-            textstyle_opts=opts.TextStyleOpts(color="#0f0"),
+            textstyle_opts=opts.TextStyleOpts(color=SCREEN_TEXT),
         ),
-        tooltip_opts=opts.TooltipOpts(trigger="axis", axis_pointer_type="cross"),
+        tooltip_opts=opts.TooltipOpts(trigger="axis", axis_pointer_type="shadow"),
     )
     bar.set_series_opts(
-        itemstyle_opts=opts.ItemStyleOpts(color="#0ff"),
-        label_opts=opts.LabelOpts(color="#000", font_size=12, rotate=45),
+        itemstyle_opts=opts.ItemStyleOpts(color="#22d3ee"),
+        label_opts=opts.LabelOpts(is_show=False),
     )
     return _render_chart(bar, "year_data.html")
 
@@ -140,33 +150,31 @@ def lang_chart():
     pie = Pie(init_opts=opts.InitOpts(height="100%", width="100%"))
     pie.add(
         "数量",
-        pairs,
-        radius=["42%", "70%"],
-        center=["50%", "50%"],
-        label_opts=opts.LabelOpts(formatter="{b}: {d}%", color="#0f0", font_size=16),
+        pairs[:8],
+        radius=["44%", "70%"],
+        center=["50%", "52%"],
+        label_opts=opts.LabelOpts(formatter="{b}: {d}%", color=SCREEN_TEXT, font_size=14),
     )
     pie.set_global_opts(
         title_opts=opts.TitleOpts(title=""),
         tooltip_opts=opts.TooltipOpts(trigger="item", formatter="{b}: {c}部 ({d}%)"),
         legend_opts=opts.LegendOpts(
+            type_="scroll",
             pos_bottom="0",
             pos_left="center",
-            textstyle_opts=opts.TextStyleOpts(color="#0f0", font_size=14),
+            textstyle_opts=opts.TextStyleOpts(color=SCREEN_TEXT, font_size=13),
         ),
     )
     pie.set_series_opts(
         itemstyle_opts=opts.ItemStyleOpts(border_color="#071d5f", border_width=2)
     )
-    pie.set_colors(["#00f5ff", "#67e8f9", "#22c55e", "#facc15"])
+    pie.set_colors(["#22d3ee", "#7dd3fc", "#34d399", "#fbbf24", "#f87171", "#a78bfa"])
     return _render_chart(pie, "lang_data.html")
 
 
 def comment_chart():
     movies, counts = _read_count_csv("comment_counts.csv")
-    display_movies = [
-        f"{name[:6]}..." if len(name) > 6 else name
-        for name in movies
-    ]
+    display_movies = [f"{name[:6]}..." if len(name) > 6 else name for name in movies]
     counts_in_wan = [round(count / 10000, 1) for count in counts]
     line = Line(init_opts=opts.InitOpts(height="100%", width="100%"))
     line.add_xaxis(display_movies)
@@ -175,30 +183,32 @@ def comment_chart():
         counts_in_wan,
         is_smooth=True,
         symbol="circle",
-        symbol_size=8,
+        symbol_size=7,
         label_opts=opts.LabelOpts(is_show=False),
-        linestyle_opts=opts.LineStyleOpts(color="#0ff", width=3),
-        itemstyle_opts=opts.ItemStyleOpts(color="#0ff"),
+        linestyle_opts=opts.LineStyleOpts(color="#22d3ee", width=3),
+        itemstyle_opts=opts.ItemStyleOpts(color="#ffd166"),
     )
     line.set_global_opts(
         title_opts=opts.TitleOpts(title=""),
         xaxis_opts=opts.AxisOpts(
             name="电影",
-            name_textstyle_opts=opts.TextStyleOpts(color="#0f0"),
-            axislabel_opts=opts.LabelOpts(color="#0f0", font_size=12, rotate=20),
-            name_location="middle",
-            name_gap=35,
+            name_textstyle_opts=opts.TextStyleOpts(color=SCREEN_MUTED),
+            axislabel_opts=opts.LabelOpts(color=SCREEN_MUTED, font_size=11, rotate=18),
+            axisline_opts=opts.AxisLineOpts(linestyle_opts=opts.LineStyleOpts(color=SCREEN_GRID)),
         ),
         yaxis_opts=opts.AxisOpts(
             name="万条",
-            name_textstyle_opts=opts.TextStyleOpts(color="#0f0"),
-            axislabel_opts=opts.LabelOpts(color="#0f0", font_size=12, formatter="{value}"),
-            name_location="middle",
-            name_gap=45,
+            name_textstyle_opts=opts.TextStyleOpts(color=SCREEN_MUTED),
+            axislabel_opts=opts.LabelOpts(color=SCREEN_MUTED, font_size=11),
+            splitline_opts=opts.SplitLineOpts(
+                is_show=True,
+                linestyle_opts=opts.LineStyleOpts(color=SCREEN_GRID),
+            ),
         ),
         legend_opts=opts.LegendOpts(
+            pos_top="0",
             pos_left="center",
-            textstyle_opts=opts.TextStyleOpts(color="#0f0"),
+            textstyle_opts=opts.TextStyleOpts(color=SCREEN_TEXT),
         ),
         tooltip_opts=opts.TooltipOpts(trigger="axis", axis_pointer_type="cross"),
     )
